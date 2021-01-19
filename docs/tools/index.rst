@@ -14,6 +14,7 @@ of a :ref:`sec-tools-fio`.
    :hidden:
 
    xnvme/index
-   zoned/index
    lblk/index
+   zoned/index
+   file/index
    fio/index

@@ -1,0 +1,16 @@
+Usage: xnvme_file <command> [<args>]
+
+Where <command> is one of:
+
+  write-read       | Write and read a file
+  dump-sync        | Write a buffer of 'data-nbytes' to file
+  dump-async       | Write a buffer of 'data-nbytes' to file --data-output
+  load-sync        | Read the entire file into memory
+  load-async       | Read the entire file into memory
+  copy-sync        | Copy file --data-input to --data--output
+  copy-async       | Copy file -- asynchronously
+
+See 'xnvme_file <command> --help' for the description of [<args>]
+
+xNVMe file - Exercise the xnvme_file API -- ver: {major: 0, minor: 0, patch: 22}
+
