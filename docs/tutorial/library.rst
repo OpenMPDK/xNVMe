@@ -3,7 +3,54 @@
 Library Usage Notes
 ===================
 
-Introducing how to use the **xNVMe** libraries and C APIs.
+The essence of xNVMe is an interface that enables you to command a device to do
+something. This is a achieved via a command-interface with asynchronous as well
+as synchronous semantics. In pseudo-code, you get a device-handle by opening
+it::
+
+  dev = xnvme_dev_open("/dev/nvme0n1");
+
+To send a command, you need a command context, for synchronous execution, then
+you retrieve a command-context from the device::
+
+  # Get a synchronous command context
+  ctx = xnvme_cmd_ctx_from_dev(dev);
+
+  # Submit and wait for completion
+  res = xnvme_cmd_pass(ctx, cmd, ...);
+
+For asynchronous execution, then you get the command context from a queue::
+
+  # Get an asynchronous command context
+  ctx = xnvme_cmd_ctx_from_queue(queue);
+
+  # Submit the command
+  res = xnvme_cmd_pass(ctx, cmd, ...);
+
+  # Process at least 'n' commands, n can be 0
+  res = xnvme_queue_poke(queue, n);
+
+  # Wait for all
+  res = xnvme_queue_wait(queue);
+
+There are more details to the use of the library. E.g. what is a command, how
+do you construct and how do you allocate and provide data for the command to
+work with? And how do you setup queues, provide callback-functions, and
+callback-function arguments?
+
+However, that is just boiler-plate code and designed to make it look and feel
+familiar.
+
+When synchronous, then there is less things to do since ``xnvme_cmd_pass`` is
+blocking until the command has completed or if it failed submitting.
+
+When using asynchronous semantics, then there is more things to do, you have to
+setup a queue, and poll/wait and implement a call-back function if you want to
+do something specific to the command that completed. This is because the
+submission and completion has been split up.
+
+However, the pseuod-code above is the gist of the library, open a device, get a
+command context and send a command.
 
 Backends
 --------
