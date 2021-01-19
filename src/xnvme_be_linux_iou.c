@@ -113,7 +113,11 @@ _linux_iou_init(struct xnvme_queue *q, int opts)
 	}
 
 	if (queue->poll_sq) {
-		io_uring_register_files(&queue->ring, &(state->fd), 1);
+		err = io_uring_register_files(&queue->ring, &(state->fd), 1);
+		if (err) {
+			XNVME_DEBUG("FAILED: io_uring_register_files, err: %d", err);
+			return err;
+		}
 	}
 
 	return 0;
