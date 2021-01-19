@@ -133,7 +133,9 @@ _linux_iou_term(struct xnvme_queue *q)
 		return -EINVAL;
 	}
 
-	io_uring_unregister_files(&queue->ring);
+	if (queue->poll_sq) {
+		io_uring_unregister_files(&queue->ring);
+	}
 	io_uring_queue_exit(&queue->ring);
 
 	return 0;
