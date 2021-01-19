@@ -4,6 +4,8 @@
 #define __INTERNAL_XNVME_BE_LINUX_IOU_H
 #include <liburing.h>
 
+#define XNVME_QUEUE_IOU_CQE_BATCH_MAX 8
+
 struct xnvme_queue_iou {
 	struct xnvme_queue_base base;
 

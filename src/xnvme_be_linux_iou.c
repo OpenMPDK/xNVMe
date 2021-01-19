@@ -145,35 +145,24 @@ int
 _linux_iou_poke(struct xnvme_queue *q, uint32_t max)
 {
 	struct xnvme_queue_iou *queue = (void *)q;
-	struct io_uring_cq *ring = &queue->ring.cq;
-	unsigned cq_ring_mask = *ring->kring_mask;
-	unsigned completed = 0;
-	unsigned head;
+	struct io_uring_cqe *cqes[XNVME_QUEUE_IOU_CQE_BATCH_MAX];
+	unsigned completed;
 
 	max = max ? max : queue->base.outstanding;
 	max = max > queue->base.outstanding ? queue->base.outstanding : max;
+	max = max > XNVME_QUEUE_IOU_CQE_BATCH_MAX ? XNVME_QUEUE_IOU_CQE_BATCH_MAX : max;
 
-	head = *ring->khead;
-	do {
-		struct io_uring_cqe *cqe;
+	completed = io_uring_peek_batch_cqe(&queue->ring, cqes, max);
+	for (unsigned i = 0; i < completed; ++i) {
+		struct io_uring_cqe *cqe = cqes[i];
 		struct xnvme_cmd_ctx *ctx;
-
-		_linux_iou_barrier();
-		if (head == *ring->ktail) {
-			break;
-		}
-		cqe = &ring->cqes[head & cq_ring_mask];
-
-		ctx = (struct xnvme_cmd_ctx *)(uintptr_t) cqe->user_data;
+		
+		ctx = io_uring_cqe_get_data(cqe);
 		if (!ctx) {
 			XNVME_DEBUG("-{[THIS SHOULD NOT HAPPEN]}-");
 			XNVME_DEBUG("cqe->user_data is NULL! => NO REQ!");
 			XNVME_DEBUG("cqe->res: %d", cqe->res);
 			XNVME_DEBUG("cqe->flags: %u", cqe->flags);
-
-			io_uring_cqe_seen(&queue->ring, cqe);
-			queue->base.outstanding -= 1;
-
 			return -EIO;
 		}
 
@@ -184,15 +173,12 @@ _linux_iou_poke(struct xnvme_queue *q, uint32_t max)
 		}
 
 		ctx->async.cb(ctx, ctx->async.cb_arg);
+	};
 
-		++completed;
-		++head;
-	} while (completed < max);
-
-	queue->base.outstanding -= completed;
-	*ring->khead = head;
-
-	_linux_iou_barrier();
+	if (completed) {
+		io_uring_cq_advance(&queue->ring, completed);
+		queue->base.outstanding -= completed;
+	}
 
 	return completed;
 }
