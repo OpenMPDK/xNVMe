@@ -17,7 +17,11 @@ const char *
 {% endfor %}
 {% for struct in structs_1 %}
 static inline int
+{% if '_yaml' is in struct["name"] and struct["yaml_args"] -%}
+{{ struct["name"] }}(FILE *stream,{% for (args,type) in struct["yaml_args"].items() -%} {{ type }} {{ args }} {%- if loop.last %}{% else %}, {%endif %}{%- endfor -%})
+{%- else -%}
 {{ struct["name"] }}_yaml(FILE *stream, const {{ struct["name"] }} *{{ struct["obj"] }}, int indent, const char *sep, int head)
+{%- endif %}
 {
 	int wrtn = 0;
 
@@ -32,11 +36,14 @@ static inline int
 	if (head) {
 		wrtn += fprintf(stream, "\n");
 	}
-
 	{% for field ,fmt in struct["members"].items() -%}
         {% if fmt is not mapping and fmt.endswith("_str") -%}
 	wrtn += fprintf(stream, "%*s{{ field }}: %s%s",
                         indent, "", {{ fmt }}({{ struct["obj"] }}->{{ field }}), {% if loop.last %}""{% else %}sep{% endif %});
+
+	{%- elif '?' is in field %}
+        wrtn += fprintf(stream, "%*s{{ field.split('?')[0]}}: {{ fmt.mem_fmt }}%s",
+                        indent, "", ({{ fmt.cond }}) ? "{{ fmt.opt_1 }}" : "{{ fmt.opt_2 }}", {% if loop.last %}""{% else %}sep{% endif %});
 
         {%- elif fmt is mapping %}
         wrtn += fprintf(stream, "%*s{{ field }}:{ {% for (mem_field,mem_fmt) in fmt.items() -%}{{ mem_field }}: {{ mem_fmt }}{% if loop.last %}}%s",{% else %}, {% endif %}
@@ -50,9 +57,9 @@ static inline int
 	wrtn += fprintf(stream, "%*s{{ field }}: {{ fmt }}%s",
                         indent, "", {{ struct["name"].split('_descr')[0] }}_state_str({{ struct["obj"] }}->{{ field }}), {% if loop.last %}""{% else %}sep{% endif %});
 
-	{%- elif 'XNVME_I8_FMT' is in fmt %}
+	{%- elif 'XNVME' is in fmt %}
         wrtn += fprintf(stream, "%*s{{ field }}: '{{ fmt }}'",
-                        indent, "", XNVME_I8_TO_STR({{ struct["obj"] }}->{{ field }}), {% if loop.last %}""{% else %}sep{% endif %}); 
+                        indent, "", XNVME{{ fmt.split('XNVME')[1].split('_FMT')[0] }}_TO_STR({{ struct["obj"] }}->{{ field }}), {% if loop.last %}""{% else %}sep{% endif %}); 
 
 	{%- else %}
         wrtn += fprintf(stream, "%*s{{ field }}: {{ fmt }}%s",
@@ -62,7 +69,7 @@ static inline int
 
 	return wrtn;
 }
-
+{% if '_yaml' is not in struct["name"] %}
 int
 {{ struct["name"] }}_fpr(FILE *stream, const struct {{ struct["name"] }} *{{ struct["obj"] }}, int opts)
 {
@@ -87,11 +94,12 @@ int
 int
 {{ struct["name"] }}_pr(const struct {{ struct["name"] }} *{{ struct["obj"] }}, int opts)
 {
-	return {{ struct["name"] }}_fpr(stdout, {{ struct["obj"] }}, opts);
+        return {{ struct["name"] }}_fpr(stdout, {{ struct["obj"] }}, opts);
 }
+{% endif %}
 {% endfor %}
 
-{% for struct in structs_2 %}
+{%- for struct in structs_2 -%}
 int
 {{ struct["name"] }}_fpr(FILE *stream, {% for (args,type) in struct["arguments"].items() -%} {{ type }} {{ args }} {%- if loop.last %}{% else %}, {%endif %}{%- endfor -%})
 {
@@ -116,20 +124,75 @@ int
                 return wrtn;
         }
 
+	{%- if struct["switch"] %}
+        switch ({{ struct["switch"] }}) {
+        {%- endif %}
+
 	wrtn += fprintf(stream, "\n");
         {% for field ,fmt in struct["members"].items() -%}
-	{%- if ':' is in fmt and '[]' is in field %}
-	wrtn += fprintf(stream, "  {{ field.split('[')[0] }}: {{ fmt.split(':')[0]}}\n",
+	{%- if struct["switch"] -%}
+        {%- if '(' is not in field and fmt == None -%}
+        case {{ field }}:
+
+	{%- elif 'default' is in field -%}
+        {{ field.split('(')[0] }}:
+                 wrtn += fprintf(stream, " { {%- for (mem_field,mem_fmt) in fmt.items() -%}{{ mem_field }}: {{mem_fmt }}," {{ field.split('(')[1].split(')')[0] }})
+                         {%- endfor %}
+        }
+
+	{%- elif '(' is in field and fmt != None %}
+        case {{ field.split('(')[0] }}:
+                 wrtn += fprintf(stream, "  {{ struct["obj"] }}: { {%- for (mem_field,mem_fmt) in fmt.items() -%}{{ mem_field }}: {{ mem_fmt }}{%- if loop.last %}}\n",                                            {% else %}, {%endif %}{%- endfor -%}
+                        {%- for (mem_field,mem_fmt) in fmt.items() %}
+                        {{ struct["obj"] }}.{{ field.split('(')[1].split(')')[0] }}.{{ mem_field }}
+                        {%- if loop.last -%});{% else %}, {% endif %}
+                        {%- endfor %}
+                 break;
+
+	{%- elif fmt is mapping %}
+	case {{ field }}:
+	{%- for (mem_field, mem_fmt) in fmt.items() %}
+	{%- if '[]' is in mem_field %}
+		for (int i = 0; i < {{ mem_field.split(']')[1] }}; ++i) {
+			{%- if 'XNVME' is in mem_fmt %}
+			wrtn += fprintf(stream, "  {{ mem_fmt }}\n", XNVME_I32_TO_STR({{ mem_field.split('[')[0] }}[i]));
+			{%- else %}
+                        wrtn += fprintf(stream, "  {{ mem_fmt }}\n", {{ mem_field.split('[')[0] }}[i]);
+			{%- endif %}
+                }
+		break;
+	{%- else %}
+		{%- if mem_fmt is mapping %}
+		{%- for (mem_field_2, mem_fmt_2) in mem_fmt.items() %}
+		wrtn += fprintf(stream, "  {{ mem_field_2 }}: {{ mem_fmt_2 }}\n", {{ struct["obj"] }}->{{ mem_field }}.{{ mem_field_2 }};
+		{%- endfor %}
+		{%- else %}
+		{%- if 'cdw' is in mem_field %}
+		wrtn += fprintf(stream, "  {{ mem_field }}: {{ mem_fmt }}\n", {{ mem_field }};
+		{%- else %}
+		wrtn += fprintf(stream, "  {{ mem_field }}: {{ mem_fmt }}\n", {{ struct["obj"] }}->{{ mem_field }};
+		{%- endif %}
+		{%- endif %}
+	{%- endif -%}
+	{%- endfor %}
+	{%- endif %}
+
+	{% elif 'add_info' is in field %}
+
+	{{ fmt }}
+
+	{%- elif ':' is in fmt and '[]' is in field %}
+        wrtn += fprintf(stream, "  {{ field.split('[')[0] }}: {{ fmt.split(':')[0]}}\n",
                         {{ fmt.split(':')[1] }}({{ struct["obj"] }}->{{ field.split('[')[0] }}, {{ field.split(']')[1] }}));
 
 	{%- elif '[]' is in field %}
-	{%- if field.split(']')[1]|int <= 4 and ('/' is not in field)  %} 
+	{%- if field.split(']')[1]|int != 0 and  (( field.split(']')[1]|int  <= 4 and '/' is not in field) and 'yaml' is not in field) %}
 	wrtn += fprintf(stream, "  {{ field.split('[')[0] }}: [{% for i in  range(field.split(']')[1]|int) %}{{ fmt }}{% if loop.last %}]\n", {% else %}, {%endif %}{%- endfor -%}
 	{%- for i in range(field.split(']')[1]|int) -%}
         {{ struct["obj"] }}->{{ field.split('[')[0] }}[{{i}}]{% if loop.last %});{% else %}, {% endif %}{%- endfor -%}
 
 	{%- else %}
-	{%- if '/' is in field and fmt is mapping %}
+	{%- if '/' is in field and (fmt is mapping and 'yaml' is not in field)  %}
 	wrtn += fprintf(stream, "  {{ field.split('[')[0] }}:\n");
         for (int i = 0; i < {{ field.split(']')[1].split('/')[0] }}; ++i) {
 		{%- if 'info' in fmt %}
@@ -145,6 +208,23 @@ int
                         {% endif %}
 			{%- endfor %}
 	}
+
+	{% elif fmt is mapping and 'yaml' is in field %}
+
+	for (int i = 0; i < {{ field.split('[')[0] }}; ++i) {
+
+		wrtn += fprintf(stream, "  - {");
+		{%- for (mem_field, list) in fmt.items() %}
+		{% if 'info' in mem_field -%}
+		{{ list }}
+		{%- else -%}
+		wrtn += {{ mem_field }}({%- for list_mem in list %}{{ list_mem }}{%- if loop.last -%}{% else %}, {% endif %}{%- endfor %});
+		{%- endif %}
+		{%- endfor %}
+                wrtn += fprintf(stream, "}\n");
+
+	}
+
 	{%- elif fmt is mapping %}
 	wrtn += fprintf(stream, "  {{ field.split('[')[0] }}:\n");
 	for (int i = 0; i < {{ field.split(']')[1] }}; ++i) {
@@ -156,11 +236,21 @@ int
         }
 	{%- else %}
 	for (int i = 0; i < {{ field.split(']')[1] }}; ++i) {
-		wrtn += fprintf(stream, "  {{ field.split('[')[0] }}: {{ fmt }}\n", i + 1,
+		wrtn += fprintf(stream, "  {{ field.split('[')[0] }}: {{ fmt }}\n",
                         {{ struct["obj"] }}->{{ field.split('[')[0] }}[i]);
 	}
 	{%- endif -%}
 	{%- endif -%}
+
+	{%- elif '{}' is in field and 'yaml' is in field %}
+	{%- for (mem_field, list) in fmt.items() %}
+	{% if 'info' in mem_field -%}
+        {{ list }}
+        {%- else -%}
+        wrtn += {{ mem_field }}({%- for list_mem in list %}{{ list_mem }}{%- if loop.last -%}{% else %}, {% endif %}{%- endfor %});
+        {%- endif %}
+	wrtn += fprintf(stream, "\n");
+        {% endfor %}
 
 	{%- elif ':' is in fmt and 'XNVME_SPEC' is in fmt %}
 	wrtn += fprintf(stream, "  {{ field }}: {{ fmt.split(':')[0] }}\n",
@@ -168,13 +258,20 @@ int
 				  strlen((const char *){{ struct["obj"] }}->{{ field }}, {{ fmt.split(':')[1] }}
                         ), {{ struct["obj"] }}->{{ field }});
 
-	{%- elif fmt is mapping %}
+	{%- elif fmt is mapping and fmt.mem_val and fmt.mem_fmt %}
+        wrtn += fprintf(stream, "  {{ field }}:{{ fmt.mem_fmt }}\n", {{ fmt.mem_val }});
+
+	{%- elif 'none' is in fmt %}
+	wrtn += fprintf(stream, "  {{ field }}:\n");
+
+	{%- elif fmt is mapping and '[]' is not in field %}
         wrtn += fprintf(stream, " {{ field }}:{");
 	{% for (mem_field,mem_fmt) in fmt.items() -%}
 	wrtn += fprintf(stream, " {{ mem_field }}: {{ mem_fmt }},", {{ struct["obj"] }}->{{ field }}.{{ mem_field }});
 	{% if loop.last %}wrtn += fprintf(stream, "}\n");
 	{% else %}{% endif %}
         {%- endfor %}
+
 	{%- else %}
         wrtn += fprintf(stream, "  {{ field }}: {{ fmt }}\n",
 			{{ struct["obj"] }}->{{ field }});

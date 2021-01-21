@@ -35,7 +35,7 @@ structs_1:
                         name : '%s'
                         enabled : '%zu'
 
-      - name: "xnvme_spec_log_health_entry"
+      - name: "xnvme_spec_log_erri_entry"
         obj: "entry"
         members:
                 ecnt: '%zu'
@@ -69,12 +69,22 @@ structs_1:
                 elbatm: '0x%08x'
                 elbat:  '0x%08x'
 
+      - name: "xnvme_dev_cmd_opts_yaml"
+        obj:  "dev"
+        yaml_args: { dev: 'const struct xnvme_dev *', indent: 'int', sep: 'const char *', head: 'int' }
+        members:
+                cmd_opts:  '"XNVME_I32_FMT"'
+                iomd?: {mem_fmt: '%s', cond: 'dev->cmd_opts & XNVME_CMD_SYNC', opt_1: 'SYNC', opt_2: 'ASYNC' }
+                payload_data?: {mem_fmt: '%s', cond: 'dev->cmd_opts & XNVME_CMD_UPLD_SGLD', opt_1: 'USER', opt_2: 'DRV' }
+                payload_meta?: {mem_fmt: '%s', cond: 'dev->cmd_opts & XNVME_CMD_UPLD_SGLM', opt_1: 'USER', opt_2: 'DRV'  }
+                csi:       '0x%x%s'
+                nsid:      '0x%u%s'
+                ssw:       '%"PRIu64"' 
 
 structs_2:
 
       - name: "xnvme_spec_log_health_entry"
         obj:  "log"
-        intial: None
         arguments: { idfy: 'const struct xnvme_spec_log_health_entry *', opts: 'int' }
         members:
                 crit_warn: '%u'
@@ -102,7 +112,6 @@ structs_2:
 
       - name: "xnvme_spec_idfy_ctrlr"
         obj:  "idfy"
-        intial: None
         arguments: { idfy: 'struct xnvme_spec_idfy_ctrlr *', opts: 'int' }
         members:
                 vid:    '%#x'
@@ -184,7 +193,6 @@ structs_2:
 
       - name: "xnvme_spec_idfy_ns"
         obj:  "idfy"
-        intial: None
         arguments: { idfy: 'const struct xnvme_spec_idfy_ns *', opts: 'int' }
         members:
                 nsze:   '%zu'
@@ -236,7 +244,6 @@ structs_2:
 
       - name: "xnvme_spec_nvm_idfy_ctrlr"
         obj:  "idfy"
-        intial: None
         arguments: { idfy: 'struct xnvme_spec_idfy_ctrlr *', opts: 'int'  }
         members:
                 oncs:
@@ -254,31 +261,26 @@ structs_2:
 
       - name: "xnvme_spec_nvm_idfy_ns"
         obj:  "idfy"
-        intial: None
         arguments: { idfy: 'struct xnvme_spec_nvm_idfy_ns *', opts: 'int'  }
         members:
                 mcl:   '%d'
                 mssrl: '%d'
                 msrc:  '%d'
- 
 
       - name: "xnvme_spec_znd_report_hdr"
         obj:  "hdr"
-        intial: None
         arguments: { hdr: 'const struct xnvme_spec_znd_report_hdr *', opts: 'int'  }
         members:
                 nzones: '%zu'
 
       - name: "xnvme_spec_znd_idfy_ctrlr"
         obj:  "zctrlr"
-        intial: None
         arguments: { zctrlr: 'struct xnvme_spec_idfy_ctrlr *', opts: 'int'  }
         members:
                 zasl:  '%d'
 
       - name: "xnvme_spec_idfy_cs"
         obj:  "idfy"
-        intial: None
         arguments: { idfy: 'const struct xnvme_spec_idfy_cs *', opts: 'int'  }
         members:
                 iocscv[]XNVME_SPEC_IDFY_CS_IOCSC_LEN/512:
@@ -288,5 +290,214 @@ structs_2:
                                                                }'
                                                         val: '0x%lx'
                                                         nvm:  '%d'
-                                                        zns:  '%d' 
+                                                        zns:  '%d'
 
+ 
+      - name: "xnvme_spec_cmd"
+        obj:  "cmd"
+        intial:
+                descr: 'uint32_t *cdw = (void *)cmd;'
+        arguments: { cmd: 'struct xnvme_spec_cmd *', opts: 'int' }
+        switch: "opts"
+        members:
+                '0x0':
+                    cdw[]16: '- "XNVME_I32_FMT"'
+                '0x1':
+                    cdw[]16: '- %#04x'
+                '0x2':
+                    cdw[]16: 'cdw%01d: %#04x'
+                '0x3':
+                    cdw[2]: '%#04x'
+                    cdw[3]: '%#04x'
+                    cdw[10]: '%#04x'
+                    cdw[11]: '%#04x'
+                    cdw[12]: '%#04x'
+                    cdw[13]: '%#04x'
+                    cdw[14]: '%#04x'
+                    cdw[15]: '%#04x'
+                    common:
+                           opcode: '%#02x'
+                           fuse:   '%#x'
+                           rsvd:   '%#x'
+                           psdt:   '%#x'
+                           cid:    '%#04x'
+                           nsid:   '%#04x'
+                           mptr:  '%#08lx'
+                           dptr.prp.prp1: '%#08lx'
+                           dptr.prp.prp2: '%#08lx'
+
+      - name: "xnvme_spec_feat"
+        obj:  "feat"
+        arguments: { fid: 'uint8_t',  feat: 'struct xnvme_spec_feat', opts: 'int' }
+        switch: "fid"
+        members:
+                XNVME_SPEC_FEAT_ERROR_RECOVERY(error_recovery):
+                                                                dulbe: '%x'
+                                                                tler:  '%x'
+                XNVME_SPEC_FEAT_TEMP_THRESHOLD(temp_threshold):
+                                                                tmpth: '%u'
+                                                                tmpsel: '0x%x'
+                                                                thsel: '0x%x'
+                XNVME_SPEC_FEAT_NQUEUES(nqueues):
+                                                     nsqa: '%u'
+                                                     ncqa: '%u'
+                XNVME_SPEC_FEAT_ARBITRATION:
+                XNVME_SPEC_FEAT_PWR_MGMT:
+                XNVME_SPEC_FEAT_LBA_RANGETYPE:
+                default(fid):
+                        ENOSYS printer not implemented for fid: '%x'
+
+      - name: "xnvme_spec_nvm_scopy_source_range"
+        obj:  "srange"
+        arguments: { srange: 'const struct xnvme_spec_nvm_scopy_source_range *', nr: 'uint8_t', opts: 'int' }
+        members:
+                nranges: {mem_fmt: '%d', mem_val: 'nr+1'}
+                nr: {mem_fmt: '%d', mem_val: 'nr'}
+                entries: 'none'
+                XNVME_SPEC_NVM_SCOPY_NENTRY_MAX[]yaml:
+                        xnvme_spec_nvm_scopy_fmt_zero_yaml: ['stream', '&srange->entry[i]', '0', '","']
+
+      - name: "xnvme_spec_log_erri_entry"
+        obj:  "log"
+        arguments: { log: 'const struct xnvme_spec_log_erri_entry *', limit: 'int', opts: 'int' }
+        members:
+                limit[]yaml:
+                        xnvme_spec_log_erri_entry_yaml: ['stream', '&log[i]', '0', '","']
+
+      - name: "xnvme_spec_znd_idfy_lbafe"
+        obj:  "zonef"
+        arguments: { zonef: 'struct xnvme_spec_znd_idfy_lbafe *', opts: 'int' }
+        members: 
+                zsze: '%zu'
+                zdes: '%d'
+
+      - name: "xnvme_spec_znd_idfy_ns"
+        obj:  "zns"
+        arguments: { zns: 'struct xnvme_spec_znd_idfy_ns *', opts: 'int' }
+        members:
+                zoc:
+                    vzcap: '%d'
+                    zae:  '%d'
+                ozcs:
+                    razb: '%d'
+                mar:  '%u'
+                mor:  '%u'
+                rrl:  '%u'
+                frl:  '%u'
+                lbafe: 'none'
+                '16[]yaml':
+                        xnvme_spec_znd_idfy_lbafe_fpr: ['stream', '&zns->lbafe[i]', 'opts']
+ 
+      - name: "xnvme_spec_znd_log_changes"
+        obj:  "changes"
+        arguments: { changes: 'const struct xnvme_spec_znd_log_changes *', opts: 'int' }
+        members:
+                nidents: '%u'
+                idents: 'none'
+                add_info: 'if (!changes->nidents) {
+                               wrtn += fprintf(stream, " ~\n");
+                               return wrtn;
+                           }'
+                idents[]changes->nidents: ' - 0x%016lx'
+ 
+      - name: "xnvme_lba_range"
+        obj:  "range"
+        arguments: { range: 'struct xnvme_lba_range *', opts: 'int' }
+        members:
+                slba: '0x%016lx'
+                elba: '0x%016lx'
+                naddrs: '%u'
+                nbytes: '%zu'
+                attr:
+                     is_zones: '%d'
+                     is_valid: '%d'
+
+      - name: "xnvme_znd_report"
+        obj:  "report"
+        arguments: { report: 'const struct xnvme_znd_report *', flags: 'int' }
+        members:
+                report_nbytes: '%zu'
+                entries_nbytes: '%zu'
+                zd_nbytes:      '%d'
+                zdext_nbytes:   '%d'
+                zrent_nbytes:   '%d'
+                zslba:          '0x%016lx'
+                zelba:          '0x%016lx'
+                nzones:         '%zu'
+                nentries:       '%u'
+                extended:       '%u'
+                entries:        'none'
+                add_info:       'if (!report->nentries) {
+                                      wrtn += fprintf(stream, " ~\n");
+                                      return wrtn;
+                                 }'
+                report->nentries[]yaml:
+                        info: 'struct xnvme_spec_znd_descr *descr = XNVME_ZND_REPORT_DESCR(report, i);'
+                        xnvme_spec_znd_descr_fpr_yaml: ['stream', 'descr', '0', '", "']
+
+      - name: "xnvme_enumeration"
+        obj:  "list"
+        arguments: { list: 'struct xnvme_enumeration *', opts: 'int' }
+        members:
+                capacity: '%u'
+                nentries: '%u'
+                entries:  'none'
+                add_info: 'if (!list->nentries) {
+                               wrtn += fprintf(stream, " ~\n");
+                               return wrtn;
+                           }'
+                list->nentries[]yaml:
+                        info: 'struct xnvme_ident *entry = &list->entries[i];'
+                        xnvme_ident_yaml: ['stream', 'entry', '0', '", "', '0']
+
+      - name: "xnvme_lba"
+        obj:  "lba"
+        arguments: { lba: 'const uint64_t *', nlb: 'uint16_t', opts: 'enum xnvme_pr' }
+        members:
+                nlbas: {mem_fmt: '%d', mem_val: 'nlb'}
+                lbas:  'none'
+                nlb[]yaml:
+                        xnvme_lba_pr: ['lba[i]', 'XNVME_PR_TERSE']
+
+      - name: "xnvme_dev"
+        obj:  "dev"
+        arguments: { dev: 'const struct xnvme_dev *', opts: 'int' }
+        members:
+                '{}yaml':
+                        xnvme_ident_yaml: ['stream', '&dev->ident', '2', '"\n"', '1' ]
+                        xnvme_be_yaml: ['stream', '&dev->be', '2', '"\n"', '1' ]
+                        xnvme_dev_cmd_opts_yaml: ['stream', 'dev', '2', '"\n"', '1' ]
+                        xnvme_geo_yaml: ['stream', '&dev->geo', '2', '"\n"', '1' ]
+
+      - name: "xnvme_ver"
+        obj: "ver"
+        arguments: { opts: 'int' }
+        members:
+                 ver: 'none'
+                 major: {mem_fmt: '%d', mem_val: 'xnvme_ver_major()'}
+                 minor: {mem_fmt: '%d', mem_val: 'xnvme_ver_minor()'}
+                 patch: {mem_fmt: '%d', mem_val: 'xnvme_ver_patch()'}
+
+      - name: "xnvme_be_attr"
+        obj:  "attr"
+        arguments: { attr: 'const struct xnvme_be_attr *', opts: 'int' }
+        members:
+                name: '%s'
+                enabled: '%d'
+                schemes: 'none'
+                schemes[]attr->nschemes: '%s'
+
+      - name: "xnvme_be_attr_list"
+        obj:  "list"
+        arguments: { list: 'const struct xnvme_be_attr_list *', opts: 'int' }
+        members:
+                xnvme_be_attr_list: 'none'
+                count: '%d'
+                capacity: '%d'
+                items: 'none'
+                add_info:  'if (!list->count) {
+                               wrtn += fprintf(stream, "~\n");
+                               return wrtn;
+                            }'
+                list->count[]yaml:
+                        xnvme_be_attr_fpr: ['stream', '&g_xnvme_be_registry[i]->attr', 'opts']
