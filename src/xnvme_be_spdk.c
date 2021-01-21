@@ -909,6 +909,7 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 	uint32_t nsid;
 	uint32_t cmb_sqs = 0x0;
 	uint32_t css = 0x0;
+	uint32_t shm_id = 0x0;
 	int err;
 
 	struct spdk_env_opts env_opts;
@@ -928,6 +929,9 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 	if (!xnvme_ident_opt_to_val(&dev->ident, "css", &css)) {
 		XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:css)");
 	}
+	if (!xnvme_ident_opt_to_val(&dev->ident, "shm_id", &shm_id)) {
+                XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:shm_id)");
+        }
 	state->cmb_sqs = cmb_sqs ? true : false;
 	state->css = css & 0x7;		// Assign only the relevant bits
 
@@ -940,6 +944,7 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 		env_opts.no_pci = true;
 	}
 
+	env_opts.shm_id = shm_id;
 	err = _spdk_env_init(&env_opts);
 	if (err) {
 		XNVME_DEBUG("FAILED: _spdk_env_init(), err: %d", err);

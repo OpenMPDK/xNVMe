@@ -89,7 +89,7 @@ xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt,
 		return false;
 	}
 
-	sprintf(fmt, "%s=%%1u", opt);
+	sprintf(fmt, "%s=%%x", opt);
 
 	return sscanf(ofz, fmt, val) == 1;
 }
