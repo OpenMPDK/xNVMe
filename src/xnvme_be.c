@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dirent.h>
 #include <paths.h>
+#include <ctype.h>
 #include <errno.h>
 #include <libxnvme.h>
 #include <libxnvme_znd.h>
@@ -94,6 +96,53 @@ xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt,
 	return sscanf(ofz, fmt, val) == 1;
 }
 
+bool
+xnvme_ident_opt_to_char_val(const struct xnvme_ident *ident, const char *opt,
+			 const char *val)
+{
+	char *ofz = NULL;
+	char fmt[100] = { 0 };
+
+	ofz = strstr(ident->opts, opt);
+	if (!ofz) {
+		return false;
+	}
+	ofz = strtok(ofz, "?");
+
+	sprintf(fmt, "%s=%%s", opt);
+
+	return sscanf(ofz, fmt, val) == 1;
+}
+
+bool 
+check_cmask_validity(const char *cmask, int nproc) 
+{
+	char string[100];
+	sscanf(cmask, "%s", string);
+
+	char *token = strtok(string,"[,-]");
+	while (token != NULL) {
+			
+		for (size_t i = 0; i < strlen(token); i ++ ) {
+			if (!isdigit(token[i])) {
+				goto not_a_number;
+			}
+		}
+			
+		if (atoi(token) >= nproc) {
+			goto fail;
+		}
+
+		token = strtok(NULL,"[,-]");
+	}
+
+	return true;
+
+	fail:
+
+	not_a_number:
+		return false;
+}
 int
 path_to_ll(const char *path, uint64_t *val)
 {

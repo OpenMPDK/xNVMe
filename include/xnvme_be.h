@@ -190,4 +190,9 @@ path_to_ll(const char *path, uint64_t *val);
 bool
 xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt, uint32_t *val);
 
+bool
+xnvme_ident_opt_to_char_val(const struct xnvme_ident *ident, const char *opt, const char *val);
+
+bool
+check_cmask_validity(const char *cmask, int nproc);
 #endif /* __INTERNAL_XNVME_BE_H */

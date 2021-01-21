@@ -10,6 +10,7 @@
 
 #ifdef XNVME_BE_SPDK_ENABLED
 #include <sys/types.h>
+#include <sys/sysinfo.h>
 #include <unistd.h>
 #include <rte_log.h>
 #include <spdk/log.h>
@@ -910,7 +911,9 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 	uint32_t cmb_sqs = 0x0;
 	uint32_t css = 0x0;
 	uint32_t shm_id = 0x0;
+	char cmask[100];
 	int err;
+	bool cmask_valid = true;
 
 	struct spdk_env_opts env_opts;
 
@@ -918,6 +921,21 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 		XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:nsid)");
 		return -EINVAL;
 	}
+	if (!xnvme_ident_opt_to_val(&dev->ident, "shm_id", &shm_id)) {
+                XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:shm_id)");
+        }
+	if (!xnvme_ident_opt_to_char_val(&dev->ident, "cmask", cmask)) {
+		XNVME_DEBUG("!xnvme_ident_opt_to_char_val(opt:cmask)");
+		cmask_valid = false;
+	}
+
+	if (cmask_valid) {
+		cmask_valid = check_cmask_validity(cmask, get_nprocs());
+		if (!cmask_valid) {
+			XNVME_DEBUG("cmask is greater than nprocs in system");
+		}
+	}
+
 	dev->nsid = nsid;
 
 	// Parse options from dev->ident
@@ -929,9 +947,6 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 	if (!xnvme_ident_opt_to_val(&dev->ident, "css", &css)) {
 		XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:css)");
 	}
-	if (!xnvme_ident_opt_to_val(&dev->ident, "shm_id", &shm_id)) {
-                XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:shm_id)");
-        }
 	state->cmb_sqs = cmb_sqs ? true : false;
 	state->css = css & 0x7;		// Assign only the relevant bits
 
@@ -945,6 +960,9 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 	}
 
 	env_opts.shm_id = shm_id;
+	if (cmask_valid) {
+		env_opts.core_mask = cmask;
+	}
 	err = _spdk_env_init(&env_opts);
 	if (err) {
 		XNVME_DEBUG("FAILED: _spdk_env_init(), err: %d", err);

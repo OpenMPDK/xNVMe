@@ -56,8 +56,9 @@ struct xnvme_be_spdk_state {
 	uint8_t cmb_sqs;
 	uint8_t css;
 	uint8_t shm_id;
+	uint8_t cmask;
 
-	uint8_t _rsvd[36];
+	uint8_t _rsvd[35];
 };
 XNVME_STATIC_ASSERT(
 	sizeof(struct xnvme_be_spdk_state) == XNVME_BE_STATE_NBYTES,
