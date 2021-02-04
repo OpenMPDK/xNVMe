@@ -88,11 +88,6 @@ _linux_iou_init(struct xnvme_queue *q, int opts)
 		queue->poll_io = 1;
 	}
 
-	// NOTE: Disabling IOPOLL, to avoid lock-up, until fixed in `_poke`
-	if (queue->poll_io) {
-		printf("ENOSYS: IORING_SETUP_IOPOLL\n");
-		queue->poll_io = 0;
-	}
 	XNVME_DEBUG("queue->poll_sq: %d", queue->poll_sq);
 	XNVME_DEBUG("queue->poll_io: %d", queue->poll_io);
 
@@ -152,11 +147,21 @@ _linux_iou_poke(struct xnvme_queue *q, uint32_t max)
 	max = max > queue->base.outstanding ? queue->base.outstanding : max;
 	max = max > XNVME_QUEUE_IOU_CQE_BATCH_MAX ? XNVME_QUEUE_IOU_CQE_BATCH_MAX : max;
 
-	completed = io_uring_peek_batch_cqe(&queue->ring, cqes, max);
+
+	if (queue->poll_io) {
+		int ret = io_uring_wait_cqe(&queue->ring, &cqes[0]);
+		if (ret) {
+			XNVME_DEBUG("FAILED: foo");
+			return ret;
+		}
+		completed = 1;
+	} else {
+		completed = io_uring_peek_batch_cqe(&queue->ring, cqes, max);
+	}
 	for (unsigned i = 0; i < completed; ++i) {
 		struct io_uring_cqe *cqe = cqes[i];
 		struct xnvme_cmd_ctx *ctx;
-		
+
 		ctx = io_uring_cqe_get_data(cqe);
 		if (!ctx) {
 			XNVME_DEBUG("-{[THIS SHOULD NOT HAPPEN]}-");
@@ -176,7 +181,11 @@ _linux_iou_poke(struct xnvme_queue *q, uint32_t max)
 	};
 
 	if (completed) {
-		io_uring_cq_advance(&queue->ring, completed);
+		if (queue->poll_io) {
+			io_uring_cqe_seen(&queue->ring, cqes[0]);
+		} else {
+			io_uring_cq_advance(&queue->ring, completed);
+		}
 		queue->base.outstanding -= completed;
 	}
 
