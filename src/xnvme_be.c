@@ -80,8 +80,7 @@ xnvme_be_pr(const struct xnvme_be *be, enum xnvme_pr opts)
 }
 
 bool
-xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt,
-		       uint32_t *val)
+xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt, uint32_t *val)
 {
 	const char *ofz = NULL;
 	char fmt[100] = { 0 };
@@ -98,7 +97,7 @@ xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt,
 
 bool
 xnvme_ident_opt_to_char_val(const struct xnvme_ident *ident, const char *opt,
-			 const char *val)
+			    const char *val)
 {
 	char *ofz = NULL;
 	char fmt[100] = { 0 };
@@ -114,34 +113,34 @@ xnvme_ident_opt_to_char_val(const struct xnvme_ident *ident, const char *opt,
 	return sscanf(ofz, fmt, val) == 1;
 }
 
-bool 
-check_cmask_validity(const char *cmask, int nproc) 
+bool
+check_cmask_validity(const char *cmask, int nproc)
 {
 	char string[100];
 	sscanf(cmask, "%s", string);
 
-	char *token = strtok(string,"[,-]");
+	char *token = strtok(string, "[,-]");
 	while (token != NULL) {
-			
-		for (size_t i = 0; i < strlen(token); i ++ ) {
+
+		for (size_t i = 0; i < strlen(token); i ++) {
 			if (!isdigit(token[i])) {
 				goto not_a_number;
 			}
 		}
-			
+
 		if (atoi(token) >= nproc) {
 			goto fail;
 		}
 
-		token = strtok(NULL,"[,-]");
+		token = strtok(NULL, "[,-]");
 	}
 
 	return true;
 
-	fail:
+fail:
 
-	not_a_number:
-		return false;
+not_a_number:
+	return false;
 }
 int
 path_to_ll(const char *path, uint64_t *val)
