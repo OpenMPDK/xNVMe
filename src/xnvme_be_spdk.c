@@ -484,6 +484,7 @@ probe_cb(void *cb_ctx, const struct spdk_nvme_transport_id *probed,
 		ctrlr_opts->keep_alive_timeout_ms = 0;
 		break;
 
+	case SPDK_NVME_TRANSPORT_VFIOUSER:
 	case SPDK_NVME_TRANSPORT_FC:
 	case SPDK_NVME_TRANSPORT_CUSTOM:
 		XNVME_DEBUG("FAILED: unsupported trtype: %d", probed->trtype);
@@ -595,6 +596,7 @@ enumerate_probe_cb(void *cb_ctx, const struct spdk_nvme_transport_id *trid,
 		ctrlr_opts->keep_alive_timeout_ms = 0;
 		break;
 
+	case SPDK_NVME_TRANSPORT_VFIOUSER:
 	case SPDK_NVME_TRANSPORT_FC:
 	case SPDK_NVME_TRANSPORT_CUSTOM:
 		XNVME_DEBUG("FAILED: unsupported trtype: %d", trid->trtype);
