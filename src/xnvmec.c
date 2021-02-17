@@ -61,11 +61,16 @@ fdio_func(void *buf, size_t nbytes, const char *path, int flags, mode_t mode)
 
 		ret = do_write ? write(hnd, buf + transferred, nbytes_call) : \
 		      read(hnd, buf + transferred, nbytes_call);
-		if (ret <= 0) {
+		if (do_write ? ret <= 0 : ret < 0) {
 			XNVME_DEBUG("FAILED: do_write: %d, ret: %ld, errno: %d",
 				    do_write, ret, errno);
 			close(hnd);
 			return -errno;
+		}
+
+		// when reading, break at end of file
+		if (!do_write && ret == 0) {
+			break;
 		}
 
 		transferred += ret;
@@ -75,12 +80,6 @@ fdio_func(void *buf, size_t nbytes, const char *path, int flags, mode_t mode)
 	if (err) {
 		XNVME_DEBUG("FAILED: do_write: %d, err: %d, errno: %d",
 			    do_write, err, errno);
-		return -errno;
-	}
-	if (transferred != nbytes) {
-		XNVME_DEBUG("FAILED: xnvmec_buf_to_file(), transferred: %zu",
-			    transferred);
-		errno = EIO;
 		return -errno;
 	}
 
