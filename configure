@@ -208,10 +208,10 @@ for i in "$@"; do
 			;;
 
 		--enable-examples)
-			CONFIG[TESTS]=ON
+			CONFIG[EXAMPLES]=ON
 			;;
 		--disable-examples)
-			CONFIG[TESTS]=OFF
+			CONFIG[EXAMPLES]=OFF
 			;;
 
 		--enable-tests)
