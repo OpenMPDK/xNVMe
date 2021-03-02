@@ -241,11 +241,23 @@ exit:
 }
 
 static int
-sub_write_uncor(struct xnvmec *XNVME_UNUSED(cli))
+sub_write_uncor(struct xnvmec *cli)
 {
-	xnvmec_pinf("Not implemented");
+	int err = 0;
+	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
+	const uint64_t slba = cli->args.slba;
+	const size_t nlb = cli->args.nlb;
+	uint32_t nsid = xnvme_dev_get_nsid(cli->args.dev);
 
-	return -1;
+	err = xnvme_nvm_write_uncorrectable(&ctx, nsid, slba, nlb);
+	if (err) {
+		xnvmec_perr("xnvme_nvm_write_uncorrectable()", err);
+		goto exit;
+	}
+
+exit:
+	return err;
 }
 
 //
