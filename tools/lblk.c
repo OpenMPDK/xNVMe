@@ -221,11 +221,23 @@ exit:
 }
 
 static int
-sub_write_zeroes(struct xnvmec *XNVME_UNUSED(cli))
+sub_write_zeroes(struct xnvmec *cli)
 {
-	xnvmec_pinf("Not implemented");
+	int err = 0;
+	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
+	const uint64_t slba = cli->args.slba;
+	const size_t nlb = cli->args.nlb;
+	uint32_t nsid = xnvme_dev_get_nsid(cli->args.dev);
 
-	return -1;
+	err = xnvme_nvm_write_zeroes(&ctx, nsid, slba, nlb);
+	if (err) {
+		xnvmec_perr("xnvme_nvm_write_zeroes()", err);
+		goto exit;
+	}
+
+exit:
+	return err;
 }
 
 static int
