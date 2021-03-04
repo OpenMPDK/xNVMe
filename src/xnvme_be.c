@@ -863,11 +863,13 @@ xnvme_ident_from_uri(const char *uri, struct xnvme_ident *ident)
 	uri_len = strlen(ident->uri);
 
 	if (uri_len < XNVME_IDENT_URI_LEN_MIN) {
+		XNVME_DEBUG("FAILED: uri is less than minimum length");
 		return -EINVAL;
 	}
 
 	matches = sscanf(ident->uri, "%4[a-z]%1[:]", ident->schm, sep);
 	if (matches != 2) {
+		XNVME_DEBUG("FAILED: uri has no scheme");
 		return -EINVAL;
 	}
 
@@ -878,6 +880,11 @@ xnvme_ident_from_uri(const char *uri, struct xnvme_ident *ident)
 
 	trgt_ofz = strnlen(ident->schm, XNVME_IDENT_SCHM_LEN) + 1;
 	trgt_len = uri_len - trgt_ofz - opts_len;
+
+	if (trgt_len >= XNVME_IDENT_TRGT_LEN) {
+		XNVME_DEBUG("FAILED: uri-target exceeds maximum length");
+		return -EINVAL;
+	}
 
 	strncpy(ident->trgt, ident->uri + trgt_ofz, trgt_len);
 
