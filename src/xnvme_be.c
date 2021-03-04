@@ -384,7 +384,6 @@ xnvme_be_dev_derive_geometry(struct xnvme_dev *dev)
 			}
 			break;
 
-		case XNVME_SPEC_CSI_NOCHECK:
 		case XNVME_SPEC_CSI_NVM:
 			if (_conventional_geometry(dev)) {
 				XNVME_DEBUG("FAILED: _conventional_geometry");

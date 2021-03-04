@@ -21,8 +21,6 @@ const char *
 xnvme_spec_csi_str(enum xnvme_spec_csi eval)
 {
 	switch (eval) {
-	case XNVME_SPEC_CSI_NOCHECK:
-		return "CSI_NOCHECK";
 	case XNVME_SPEC_CSI_NVM:
 		return "CSI_NVM";
 	case XNVME_SPEC_CSI_ZONED:

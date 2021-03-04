@@ -802,7 +802,7 @@ xnvme_be_spdk_dev_idfy(struct xnvme_dev *dev)
 	int err;
 
 	dev->dtype = XNVME_DEV_TYPE_NVME_NAMESPACE;
-	dev->csi = XNVME_SPEC_CSI_NOCHECK;
+	dev->csi = XNVME_SPEC_CSI_NVM;		// Assume NVM
 
 	// Allocate buffers for idfy
 	idfy_ctrlr = spdk_dma_malloc(sizeof(*idfy_ctrlr), 0x1000, NULL);
@@ -837,7 +837,6 @@ xnvme_be_spdk_dev_idfy(struct xnvme_dev *dev)
 	//
 	// Determine command-set / namespace type by probing
 	//
-	dev->csi = XNVME_SPEC_CSI_NVM;		// Assume NVM
 
 	// Attempt to identify Zoned Namespace
 	{

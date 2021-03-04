@@ -235,11 +235,7 @@ XNVME_STATIC_ASSERT(sizeof(struct xnvme_spec_lbaf) == 4, "Incorrect size")
 enum xnvme_spec_csi {
 	XNVME_SPEC_CSI_NVM	= 0x0,	///< XNVME_SPEC_CSI_NVM
 	XNVME_SPEC_CSI_ZONED	= 0x2,	///< XNVME_SPEC_CSI_ZONED
-
-	XNVME_SPEC_CSI_NOCHECK	= 0xFF,	///< XNVME_SPEC_CSI_NOCHECK
 };
-
-
 
 /**
  * Representation of NVMe completion result Identify Namespace

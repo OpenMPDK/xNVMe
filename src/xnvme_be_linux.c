@@ -297,7 +297,7 @@ xnvme_be_linux_dev_idfy(struct xnvme_dev *dev)
 		dev->nsid = 1;
 	} else {
 		dev->dtype = XNVME_DEV_TYPE_NVME_NAMESPACE;
-		dev->csi = XNVME_SPEC_CSI_NOCHECK;
+		dev->csi = XNVME_SPEC_CSI_NVM;
 		err = xnvme_be_linux_nvme_dev_nsid(dev);
 		if (err < 1) {
 			XNVME_DEBUG("FAILED: retrieving nsid, got: %x", err);

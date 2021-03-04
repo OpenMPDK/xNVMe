@@ -89,7 +89,7 @@ xnvme_adm_idfy_ns(struct xnvme_cmd_ctx *ctx, uint32_t nsid, struct xnvme_spec_id
 	ctx->cmd.common.opcode = XNVME_SPEC_ADM_OPC_IDFY;
 	ctx->cmd.common.nsid = (nsid) ? nsid : xnvme_dev_get_nsid(ctx->dev);
 	ctx->cmd.idfy.cns = XNVME_SPEC_IDFY_NS;
-	ctx->cmd.idfy.csi = XNVME_SPEC_CSI_NOCHECK;
+	ctx->cmd.idfy.csi = 0x0;
 
 	return xnvme_cmd_pass_admin(ctx, dbuf, dbuf_nbytes, NULL, 0x0);
 }
