@@ -80,7 +80,7 @@ _sub_idfy(struct xnvmec *cli, uint8_t cns, uint16_t cntid, uint8_t nsid,
 	ctx.cmd.idfy.nvmsetid = nvmsetid;
 	ctx.cmd.idfy.uuid = uuid;
 
-	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
 	if (!dbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -187,7 +187,7 @@ sub_log_health(struct xnvmec *cli)
 	}
 
 	xnvmec_pinf("Allocating and clearing buffer...");
-	log = xnvme_buf_alloc(dev, log_nbytes, NULL);
+	log = xnvme_buf_alloc(dev, log_nbytes);
 	if (!log) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -237,7 +237,7 @@ sub_log_erri(struct xnvmec *cli)
 	log_nbytes = log_nentries * sizeof(*log);
 
 	xnvmec_pinf("Allocating and clearing buffer...");
-	log = xnvme_buf_alloc(dev, log_nbytes, NULL);
+	log = xnvme_buf_alloc(dev, log_nbytes);
 	if (!log) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -293,7 +293,7 @@ sub_log(struct xnvmec *cli)
 		goto exit;
 	}
 
-	buf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!buf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -473,7 +473,7 @@ sub_pass(struct xnvmec *cli, int admin)
 	}
 
 	if (data_nbytes) {
-		data_buf = xnvme_buf_alloc(dev, data_nbytes, NULL);
+		data_buf = xnvme_buf_alloc(dev, data_nbytes);
 		if (!data_buf) {
 			err = -errno;
 			xnvmec_perr("xnvme_buf_alloc()", err);
@@ -488,7 +488,7 @@ sub_pass(struct xnvmec *cli, int admin)
 	}
 
 	if (meta_nbytes) {
-		meta_buf = xnvme_buf_alloc(dev, meta_nbytes, NULL);
+		meta_buf = xnvme_buf_alloc(dev, meta_nbytes);
 		if (!meta_buf) {
 			err = -errno;
 			xnvmec_perr("xnvme_buf_alloc()", err);

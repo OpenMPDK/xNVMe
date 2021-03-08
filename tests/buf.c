@@ -14,14 +14,13 @@ test_buf_alloc_free(struct xnvmec *cli)
 
 	for (uint64_t i = 0; i < count; ++i) {
 		size_t buf_nbytes = 1 << i;
-		uint64_t phys = 0;
 		void *buf;
 
 		printf("\n");
 		xnvmec_pinf("[alloc/free] i: %zu, buf_nbytes: %zu",
 			    i + 1, buf_nbytes);
 
-		buf = xnvme_buf_alloc(cli->args.dev, buf_nbytes, &phys);
+		buf = xnvme_buf_alloc(cli->args.dev, buf_nbytes);
 		if (!buf) {
 			xnvmec_perr("xnvme_buf_alloc()", -errno);
 			nerr += 1;
@@ -29,7 +28,7 @@ test_buf_alloc_free(struct xnvmec *cli)
 		}
 		xnvme_buf_free(cli->args.dev, buf);
 
-		xnvmec_pinf("buf: %p, phys: 0x%lx", buf, phys);
+		xnvmec_pinf("buf: %p", buf);
 	}
 
 	printf("\n");

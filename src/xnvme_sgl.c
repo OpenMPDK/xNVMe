@@ -45,7 +45,7 @@ struct xnvme_sgl *xnvme_sgl_create(struct xnvme_dev *dev, int hint)
 	}
 
 	if (hint) {
-		sgl->descriptors = xnvme_buf_alloc(dev, hint * dsize, NULL);
+		sgl->descriptors = xnvme_buf_alloc(dev, hint * dsize);
 		if (!sgl->descriptors) {
 			free(sgl);
 			return NULL;
@@ -53,7 +53,7 @@ struct xnvme_sgl *xnvme_sgl_create(struct xnvme_dev *dev, int hint)
 	}
 
 	sgl->nalloc = hint;
-	sgl->indirect = xnvme_buf_alloc(dev, dsize, NULL);
+	sgl->indirect = xnvme_buf_alloc(dev, dsize);
 
 	return sgl;
 }
@@ -114,7 +114,7 @@ xnvme_sgl_add(struct xnvme_dev *dev, struct xnvme_sgl *sgl, void *buf,
 		sgl->nalloc = sgl->nalloc ? 2 * sgl->nalloc : 1;
 		desr_nbytes = sgl->nalloc * sizeof(struct xnvme_spec_sgl_descriptor);
 		sgl->descriptors = xnvme_buf_realloc(dev, sgl->descriptors,
-						     desr_nbytes, NULL);
+						     desr_nbytes);
 		if (!sgl->descriptors) {
 			return -1;
 		}

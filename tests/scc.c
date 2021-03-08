@@ -154,7 +154,7 @@ _scopy_helper(struct xnvmec *cli, uint64_t tlbas)
 	}
 
 	// Buffer for source-range
-	range = xnvme_buf_alloc(dev, sizeof(*range), NULL);
+	range = xnvme_buf_alloc(dev, sizeof(*range));
 	if (!range) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -164,13 +164,13 @@ _scopy_helper(struct xnvmec *cli, uint64_t tlbas)
 
 	// Buffers for verification
 	buf_nbytes = tlbas * geo->lba_nbytes;
-	dbuf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!dbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
 		goto exit;
 	}
-	vbuf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	vbuf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!vbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);

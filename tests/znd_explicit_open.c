@@ -33,7 +33,7 @@ test_open_zdptr(struct xnvmec *cli)
 	}
 
 	// Allocate and fill Zone Descriptor Extension
-	zde = xnvme_buf_alloc(dev, zde_nbytes, NULL);
+	zde = xnvme_buf_alloc(dev, zde_nbytes);
 	if (!zde) {
 		xnvmec_pinf("xnvme_buf_alloc(zde_nbytes)");
 		err = -errno;

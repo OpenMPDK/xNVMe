@@ -72,7 +72,7 @@ sub_async_read(struct xnvmec *cli)
 	}
 
 	xnvmec_pinf("Allocating and filling buf of nbytes: %zu", rng.nbytes);
-	buf = xnvme_buf_alloc(dev, rng.nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, rng.nbytes);
 	if (!buf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -200,7 +200,7 @@ sub_async_write(struct xnvmec *cli)
 	}
 
 	xnvmec_pinf("Allocating and filling buf of nbytes: %zu", rng.nbytes);
-	buf = xnvme_buf_alloc(dev, rng.nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, rng.nbytes);
 	if (!buf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);

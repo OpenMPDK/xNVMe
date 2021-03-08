@@ -82,7 +82,7 @@ main(int argc, char **argv)
 	buf_nbytes = xnvme_dev_get_geo(dev)->nbytes;
 
 	xnvmec_pinf("Allocate a payload-buffer of nbytes: %zu", buf_nbytes);
-	buf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!buf) {
 		xnvmec_perr("xnvme_buf_alloc()", errno);
 		goto exit;

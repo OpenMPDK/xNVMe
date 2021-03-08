@@ -49,14 +49,14 @@ boilerplate(struct xnvmec *cli, uint8_t **wbuf, uint8_t **rbuf,
 	}
 	// TODO: verify that the range is sufficiently large
 
-	*wbuf = xnvme_buf_alloc(dev, *buf_nbytes, NULL);
+	*wbuf = xnvme_buf_alloc(dev, *buf_nbytes);
 	if (!*wbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
 		return err;
 	}
 
-	*rbuf = xnvme_buf_alloc(dev, *buf_nbytes, NULL);
+	*rbuf = xnvme_buf_alloc(dev, *buf_nbytes);
 	if (!*rbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -275,7 +275,7 @@ test_scopy(struct xnvmec *cli)
 	}
 	buf_nbytes = xfer_naddr * geo->nbytes;
 
-	sranges = xnvme_buf_alloc(dev, sizeof(*sranges), NULL);
+	sranges = xnvme_buf_alloc(dev, sizeof(*sranges));
 	if (!sranges) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);

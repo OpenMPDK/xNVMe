@@ -131,7 +131,7 @@ xnvme_znd_report_from_dev(struct xnvme_dev *dev, uint64_t slba, size_t limit, ui
 	}
 
 	// Allocate device buffer for mgmt-recv commands
-	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
 	if (!dbuf) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc()");
 		xnvme_buf_virt_free(report);
@@ -221,7 +221,7 @@ xnvme_znd_descr_from_dev(struct xnvme_dev *dev, uint64_t slba, struct xnvme_spec
 	int err;
 
 	dbuf_nbytes = sizeof(*hdr) + sizeof(*zdescr);
-	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
 	if (!dbuf) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc()");
 		return -errno;
@@ -293,7 +293,7 @@ xnvme_znd_descr_from_dev_in_state(struct xnvme_dev *dev, enum xnvme_spec_znd_sta
 	}
 
 	dbuf_nbytes = sizeof(*hdr) + sizeof(*zdescr);
-	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
 	if (!dbuf) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc(%zu)", dbuf_nbytes);
 		return -errno;
@@ -332,7 +332,7 @@ xnvme_znd_stat(struct xnvme_dev *dev, enum xnvme_spec_znd_cmd_mgmt_recv_action_s
 	const size_t hdr_nbytes = sizeof(*hdr);
 	int err;
 
-	hdr = xnvme_buf_alloc(dev, hdr_nbytes, NULL);
+	hdr = xnvme_buf_alloc(dev, hdr_nbytes);
 	if (!hdr) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc()");
 		return -errno;
@@ -364,7 +364,7 @@ xnvme_znd_log_changes_from_dev(struct xnvme_dev *dev)
 	int err;
 
 	// Allocate buffer for the maximum possible amount of log entries
-	log = xnvme_buf_alloc(dev, log_nbytes, NULL);
+	log = xnvme_buf_alloc(dev, log_nbytes);
 	if (!log) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc");
 		return NULL;

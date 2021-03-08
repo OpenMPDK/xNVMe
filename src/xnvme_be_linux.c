@@ -305,13 +305,13 @@ xnvme_be_linux_dev_idfy(struct xnvme_dev *dev)
 	}
 
 	// Allocate buffers for idfy
-	idfy_ctrlr = xnvme_buf_alloc(dev, sizeof(*idfy_ctrlr), NULL);
+	idfy_ctrlr = xnvme_buf_alloc(dev, sizeof(*idfy_ctrlr));
 	if (!idfy_ctrlr) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc()");
 		err = -errno;
 		goto exit;
 	}
-	idfy_ns = xnvme_buf_alloc(dev, sizeof(*idfy_ns), NULL);
+	idfy_ns = xnvme_buf_alloc(dev, sizeof(*idfy_ns));
 	if (!idfy_ns) {
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc()");
 		err = -errno;

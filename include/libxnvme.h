@@ -25,6 +25,7 @@ extern "C" {
 #include <libxnvme_util.h>
 #include <libxnvme_geo.h>
 #include <libxnvme_dev.h>
+#include <libxnvme_buf.h>
 
 /**
  * List of devices found on the system usable with xNVMe
@@ -90,14 +91,12 @@ xnvme_dev_close(struct xnvme_dev *dev);
  *
  * @param dev Device handle obtained with xnvme_dev_open() / xnvme_dev_openf()
  * @param nbytes The size of the allocated buffer in bytes
- * @param phys A pointer to the variable to hold the physical address of the allocated buffer. If
- * NULL, the physical address is not returned.
  *
  * @return On success, a pointer to the allocated memory is returned. On error, NULL is returned
  * and `errno` set to indicate the error.
  */
 void *
-xnvme_buf_alloc(const struct xnvme_dev *dev, size_t nbytes, uint64_t *phys);
+xnvme_buf_alloc(const struct xnvme_dev *dev, size_t nbytes);
 
 /**
  * Reallocate a buffer for IO with the given device
@@ -113,14 +112,12 @@ xnvme_buf_alloc(const struct xnvme_dev *dev, size_t nbytes, uint64_t *phys);
  * @param dev Device handle obtained with xnvme_dev_open() / xnvme_dev_openf()
  * @param buf The buffer to reallocate
  * @param nbytes The size of the allocated buffer in bytes
- * @param phys A pointer to the variable to hold the physical address of the allocated buffer. If
- * NULL, the physical address is not returned.
  *
  * @return On success, a pointer to the allocated memory is returned. On error, NULL is returned
  * and `errno` set to indicate the error.
  */
 void *
-xnvme_buf_realloc(const struct xnvme_dev *dev, void *buf, size_t nbytes, uint64_t *phys);
+xnvme_buf_realloc(const struct xnvme_dev *dev, void *buf, size_t nbytes);
 
 /**
  * Free the given IO buffer allocated with xnvme_buf_alloc()
@@ -130,41 +127,6 @@ xnvme_buf_realloc(const struct xnvme_dev *dev, void *buf, size_t nbytes, uint64_
  */
 void
 xnvme_buf_free(const struct xnvme_dev *dev, void *buf);
-
-/**
- * Retrieve the physical address of the given buffer
- *
- * @param dev Device handle obtained with xnvme_dev_open() / xnvme_dev_openf()
- * @param buf Pointer to a buffer allocated with xnvme_buf_alloc()
- * @param phys A pointer to the variable to hold the physical address of the given buffer.
- *
- * @return On success, 0 is returned. On error, negative `errno` is returned.
- */
-int
-xnvme_buf_vtophys(const struct xnvme_dev *dev, void *buf, uint64_t *phys);
-
-/**
- * Allocate a buffer of virtual memory of the given `alignment` and `nbytes`
- *
- * @note
- * You must use xnvme_buf_virt_free() to de-allocate the buffer
- *
- * @param alignment The alignment in bytes
- * @param nbytes The size of the buffer in bytes
- *
- * @return On success, a pointer to the allocated memory is return. On error, NULL is returned and
- * `errno` set to indicate the error
- */
-void *
-xnvme_buf_virt_alloc(size_t alignment, size_t nbytes);
-
-/**
- * Free the given virtual memory buffer
- *
- * @param buf Pointer to a buffer allocated with xnvme_buf_virt_alloc()
- */
-void
-xnvme_buf_virt_free(void *buf);
 
 /**
  * Opaque Command Queue Handle to be initialized by xnvme_queue_init()

@@ -71,13 +71,13 @@ cmd_verify(struct xnvmec *cli)
 	// Buffers for verification
 	buf_nbytes = zone.zcap * geo->lba_nbytes;
 	xnvmec_pinf("Allocating buffers...");
-	dbuf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!dbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
 		goto exit;
 	}
-	vbuf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	vbuf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!vbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);

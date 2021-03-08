@@ -405,7 +405,7 @@ xnvme_fioe_iomem_alloc(struct thread_data *td, size_t total_mem)
 		return 1;
 	}
 
-	td->orig_buffer = xnvme_buf_alloc(fwrap->dev, total_mem, NULL);
+	td->orig_buffer = xnvme_buf_alloc(fwrap->dev, total_mem);
 
 	return td->orig_buffer == NULL;
 }

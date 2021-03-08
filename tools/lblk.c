@@ -51,7 +51,7 @@ sub_idfy(struct xnvmec *cli)
 
 	xnvmec_pinf("xnvme_adm_idfy: {nsid: 0x%x}", nsid);
 
-	idfy = xnvme_buf_alloc(dev, sizeof(*idfy), NULL);
+	idfy = xnvme_buf_alloc(dev, sizeof(*idfy));
 	if (!idfy) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -108,7 +108,7 @@ sub_read(struct xnvmec *cli)
 		    nsid, slba, nlb);
 
 	xnvmec_pinf("Alloc/clear dbuf, dbuf_nbytes: %zu", dbuf_nbytes);
-	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
 	if (!dbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -118,7 +118,7 @@ sub_read(struct xnvmec *cli)
 
 	if (mbuf_nbytes) {
 		xnvmec_pinf("Alloc/clear mbuf, mbuf_nbytes: %zu", mbuf_nbytes);
-		mbuf = xnvme_buf_alloc(dev, mbuf_nbytes, NULL);
+		mbuf = xnvme_buf_alloc(dev, mbuf_nbytes);
 		if (!mbuf) {
 			err = -errno;
 			xnvmec_perr("xnvme_buf_alloc()", err);
@@ -177,7 +177,7 @@ sub_write(struct xnvmec *cli)
 		    nsid, slba, nlb);
 
 	xnvmec_pinf("Alloc/fill dbuf, dbuf_nbytes: %zu", dbuf_nbytes);
-	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes, NULL);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
 	if (!dbuf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -191,7 +191,7 @@ sub_write(struct xnvmec *cli)
 
 	if (mbuf_nbytes) {
 		xnvmec_pinf("Alloc/fill mbuf, mbuf_nbytes: %zu", mbuf_nbytes);
-		mbuf = xnvme_buf_alloc(dev, mbuf_nbytes, NULL);
+		mbuf = xnvme_buf_alloc(dev, mbuf_nbytes);
 		if (!mbuf) {
 			err = -errno;
 			xnvmec_perr("xnvme_buf_alloc()", err);

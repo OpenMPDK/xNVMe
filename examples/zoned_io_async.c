@@ -83,7 +83,7 @@ sub_async_read(struct xnvmec *cli)
 	buf_nbytes = zone.zcap * geo->lba_nbytes;
 
 	xnvmec_pinf("Allocating and filling buf_nbytes: %zu", buf_nbytes);
-	buf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!buf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -221,7 +221,7 @@ sub_async_write(struct xnvmec *cli)
 	buf_nbytes = zone.zcap * geo->lba_nbytes;
 
 	xnvmec_pinf("Allocating and filling buf_nbytes: %zu", buf_nbytes);
-	buf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!buf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
@@ -355,7 +355,7 @@ sub_async_append(struct xnvmec *cli)
 	buf_nbytes = zone.zcap * geo->lba_nbytes;
 
 	xnvmec_pinf("Allocating and filling buf_nbytes: %zu", buf_nbytes);
-	buf = xnvme_buf_alloc(dev, buf_nbytes, NULL);
+	buf = xnvme_buf_alloc(dev, buf_nbytes);
 	if (!buf) {
 		err = -errno;
 		xnvmec_perr("xnvme_buf_alloc()", err);
