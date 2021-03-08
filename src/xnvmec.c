@@ -290,6 +290,7 @@ xnvmec_int2opt(int opt) {
 	case XNVMEC_OPT_LIMIT:
 	case XNVMEC_OPT_IOSIZE:
 	case XNVMEC_OPT_QDEPTH:
+	case XNVMEC_OPT_DIRECT:
 	case XNVMEC_OPT_STATUS:
 	case XNVMEC_OPT_SAVE:
 	case XNVMEC_OPT_RESET:
@@ -304,7 +305,6 @@ xnvmec_int2opt(int opt) {
 	case XNVMEC_OPT_ALL:
 		return val;
 
-	case XNVMEC_OPT_UNUSED02:
 	case XNVMEC_OPT_UNUSED03:
 	case XNVMEC_OPT_UNUSED04:
 	case XNVMEC_OPT_UNUSED05:
@@ -426,6 +426,7 @@ static struct xnvmec_opt_attr xnvmec_opts[] = {
 	{XNVMEC_OPT_LIMIT,	XNVMEC_OPT_VTYPE_NUM,	"limit",	"Restrict amount to 'NUM'"},
 	{XNVMEC_OPT_IOSIZE,	XNVMEC_OPT_VTYPE_NUM,	"iosize",	"Use given 'NUM' as bs/iosize"},
 	{XNVMEC_OPT_QDEPTH,	XNVMEC_OPT_VTYPE_NUM,	"qdepth",	"Use given 'NUM' as queue max capacity"},
+	{XNVMEC_OPT_DIRECT,	XNVMEC_OPT_VTYPE_NUM,	"direct",	"Bypass layers"},
 
 	{XNVMEC_OPT_COUNT,	XNVMEC_OPT_VTYPE_NUM,	"count",	"Use given 'NUM' as count"},
 	{XNVMEC_OPT_OFFSET,	XNVMEC_OPT_VTYPE_NUM,	"offset",	"Use given 'NUM' as offset"},
@@ -853,6 +854,9 @@ xnvmec_assign_arg(struct xnvmec *cli, int optval, char *arg,
 	case XNVMEC_OPT_QDEPTH:
 		args->qdepth = num;
 		break;
+	case XNVMEC_OPT_DIRECT:
+		args->direct = arg ? num : 1;
+		break;
 
 	case XNVMEC_OPT_OPCODE:
 		args->opcode = num;
@@ -887,7 +891,6 @@ xnvmec_assign_arg(struct xnvmec *cli, int optval, char *arg,
 		args->offset = arg ? num : 1;
 		break;
 
-	case XNVMEC_OPT_UNUSED02:
 	case XNVMEC_OPT_UNUSED03:
 	case XNVMEC_OPT_UNUSED04:
 	case XNVMEC_OPT_UNUSED05:
