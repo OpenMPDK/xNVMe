@@ -227,8 +227,7 @@ xnvme_be_linux_state_init(struct xnvme_dev *dev, void *XNVME_UNUSED(opts))
 		for (int i = 0; i < g_linux_sync_count; ++i) {
 			struct xnvme_be_sync *sync = g_linux_sync[i];
 
-			XNVME_DEBUG("id: %s, enabled: %zu", sync->id,
-				    sync->enabled);
+			XNVME_DEBUG("id: %s, enabled: %zu", sync->id, sync->enabled);
 
 			if (sync->enabled && sync->supported(dev, 0x0)) {
 				dev->be.sync = *sync;
