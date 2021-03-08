@@ -168,6 +168,7 @@ struct xnvmec_args {
 	uint32_t feat;
 
 	uint32_t seed;
+	uint32_t iosize;
 	uint32_t qdepth;
 	uint32_t limit;
 
@@ -265,6 +266,7 @@ enum xnvmec_opt {
 
 	XNVMEC_OPT_SEED = 'r', ///< XNVMEC_OPT_SEED
 	XNVMEC_OPT_LIMIT = 's', ///< XNVMEC_OPT_LIMIT
+	XNVMEC_OPT_IOSIZE = '}', ///< XNVMEC_OPT_IOSIZE
 	XNVMEC_OPT_QDEPTH = 't', ///< XNVMEC_OPT_QDEPTH
 
 	XNVMEC_OPT_STATUS = 'u', ///< XNVMEC_OPT_STATUS
@@ -281,7 +283,6 @@ enum xnvmec_opt {
 
 	XNVMEC_OPT_ALL = '.', ///< XNVMEC_OPT_ALL
 
-	XNVMEC_OPT_UNUSED01 = '}',
 	XNVMEC_OPT_UNUSED02 = '~',
 	XNVMEC_OPT_UNUSED03 = '!',
 	XNVMEC_OPT_UNUSED04 = '"',
