@@ -10,6 +10,7 @@
 #include <libxnvme_be.h>
 #include <xnvme_be.h>
 #include <xnvme_be_nosys.h>
+#include <libxnvme_file.h>
 
 #define XNVME_BE_LINUX_SCHM "file"
 #define XNVME_BE_LINUX_NAME "linux"
@@ -35,6 +36,7 @@
 
 extern struct xnvme_be_sync g_linux_nvme;
 extern struct xnvme_be_sync g_linux_block;
+extern struct xnvme_be_sync g_linux_fs;
 
 static struct xnvme_be_sync *g_linux_sync[] = {
 	&g_linux_nvme,
@@ -186,8 +188,9 @@ xnvme_be_linux_state_term(struct xnvme_be_linux_state *state)
 }
 
 int
-xnvme_be_linux_state_init(struct xnvme_dev *dev, void *XNVME_UNUSED(opts))
+xnvme_be_linux_state_init(struct xnvme_dev *dev, void *opts)
 {
+	struct xnvme_be_linux_opts *linux_opts = opts;
 	struct xnvme_be_linux_state *state = (void *)dev->be.state;
 	struct stat dev_stat;
 	uint32_t opt_val;
@@ -199,37 +202,61 @@ xnvme_be_linux_state_init(struct xnvme_dev *dev, void *XNVME_UNUSED(opts))
 	if (xnvme_ident_opt_to_val(&dev->ident, "poll_sq", &opt_val)) {
 		state->poll_sq = opt_val == 1;
 	}
+	XNVME_DEBUG("INFO: flags: 0x%x, mode: 0x%x", linux_opts->flags, linux_opts->mode);
 	XNVME_DEBUG("state->poll_io: %d", state->poll_io);
 	XNVME_DEBUG("state->poll_sq: %d", state->poll_sq);
 
-	state->fd = open(dev->ident.trgt, O_RDWR | O_DIRECT);
+	state->fd = open(dev->ident.trgt, linux_opts->flags, linux_opts->mode);
 	if (state->fd < 0) {
-		XNVME_DEBUG("FAILED: open(trgt: '%s'), state->fd: '%d'\n",
-			    dev->ident.trgt, state->fd);
+		XNVME_DEBUG("FAILED: open(trgt: '%s'), state->fd: '%d', errno: %d",
+			    dev->ident.trgt, state->fd, errno);
 		return -errno;
 	}
 	err = fstat(state->fd, &dev_stat);
 	if (err < 0) {
+		XNVME_DEBUG("FAILED: err: %d, errno: %d", err, errno);
 		return -errno;
-	}
-	if (!S_ISBLK(dev_stat.st_mode)) {
-		XNVME_DEBUG("FAILED: device is not a block device");
-		return -ENOTBLK;
 	}
 
 	// Determine sync-engine to use and setup func-pointers
-	{
+	switch (dev_stat.st_mode & S_IFMT) {
+	case S_IFREG:
+		XNVME_DEBUG("INFO: regular file");
+		dev->be.sync = g_linux_fs;
+		break;
+
+	case S_IFCHR:
+		XNVME_DEBUG("INFO: char-device file");
+		dev->be.sync = g_linux_nvme;
+		break;
+
+	case S_IFBLK:
+		XNVME_DEBUG("INFO: block-device file");
 		for (int i = 0; i < g_linux_sync_count; ++i) {
 			struct xnvme_be_sync *sync = g_linux_sync[i];
 
 			XNVME_DEBUG("id: %s, enabled: %zu", sync->id, sync->enabled);
 
-			if (sync->enabled && sync->supported(dev, 0x0)) {
-				dev->be.sync = *sync;
-				XNVME_DEBUG("got: %s", sync->id);
-				break;
+			if (!(sync->enabled && sync->supported(dev, 0x0))) {
+				XNVME_DEBUG("INFO: skipping: '%s'", sync->id);
+				continue;
 			}
+
+			dev->be.sync = *sync;
+			break;
+
 		}
+		break;
+
+	default:
+		XNVME_DEBUG("FAILED: unsupported file-type");
+		return -EINVAL;
+	}
+
+	XNVME_DEBUG("INFO: selected sync: '%s'", dev->be.sync.id);
+	if (!(dev->be.sync.enabled && dev->be.sync.supported(dev, 0x0))) {
+		XNVME_DEBUG("FAILED: skipping, !enabled || !supported");
+		return -ENOSYS;
 	}
 
 	// Determine async-engine to use and setup the func-pointers
@@ -262,6 +289,8 @@ xnvme_be_linux_state_init(struct xnvme_dev *dev, void *XNVME_UNUSED(opts))
 		return -ENOSYS;
 	}
 
+	XNVME_DEBUG("INFO: selected async: '%s'", dev->be.async.id);
+
 	return 0;
 }
 
@@ -288,6 +317,10 @@ xnvme_be_linux_dev_idfy(struct xnvme_dev *dev)
 
 	if (strncmp(dev->be.sync.id, "block_ioctl", 11) == 0) {
 		dev->dtype = XNVME_DEV_TYPE_BLOCK_DEVICE;
+		dev->csi = XNVME_SPEC_CSI_NVM;
+		dev->nsid = 1;
+	} else if (strncmp(dev->be.sync.id, g_linux_fs.id, 11) == 0) {
+		dev->dtype = XNVME_DEV_TYPE_FS_FILE;
 		dev->csi = XNVME_SPEC_CSI_NVM;
 		dev->nsid = 1;
 	} else {
@@ -397,9 +430,73 @@ exit:
 	return err;
 }
 
+struct xnvme_be_linux_opts
+xnvme_be_linux_parse_opts(const struct xnvme_ident *ident)
+{
+	struct xnvme_be_linux_opts opts = { 0 };
+
+	uint32_t create, direct, rdonly, wronly, rdwr = 0;
+	char cmask[5];
+
+	int xnvme_flags = 0;
+	if (xnvme_ident_opt_to_val(ident, "create", &create) && create) {
+		xnvme_flags |= XNVME_FILE_OFLG_CREATE;
+		opts.mode = 0755; // default value
+	}
+
+	if (xnvme_ident_opt_to_val(ident, "direct", &direct)) {
+		if (direct) {
+			xnvme_flags |= XNVME_FILE_OFLG_DIRECT_ON;
+		} else {
+			xnvme_flags |= XNVME_FILE_OFLG_DIRECT_OFF;
+		}
+	} else {
+		xnvme_flags |= XNVME_FILE_OFLG_DIRECT_ON;
+	}
+
+	if (xnvme_ident_opt_to_val(ident, "rdonly", &rdonly)) {
+		if (rdonly) {
+			xnvme_flags |= XNVME_FILE_OFLG_RDONLY;
+		}
+	} else if (xnvme_ident_opt_to_val(ident, "wronly", &wronly)) {
+		if (wronly) {
+			xnvme_flags |= XNVME_FILE_OFLG_WRONLY;
+		}
+	} else if (xnvme_ident_opt_to_val(ident, "rdwr", &rdwr) && rdwr) {
+		if (rdwr) {
+			xnvme_flags |= XNVME_FILE_OFLG_RDWR;
+		}
+	} else {	// None explicitly chosen, set a default
+		xnvme_flags |= XNVME_FILE_OFLG_RDWR;
+	}
+
+	if (xnvme_ident_opt_to_char_val(ident, "cmask", cmask)) {
+		opts.mode = strtol(cmask, NULL, 8);
+	}
+
+	if (xnvme_flags & XNVME_FILE_OFLG_CREATE) {
+		opts.flags |= O_CREAT;
+	}
+	if (xnvme_flags & XNVME_FILE_OFLG_DIRECT_ON) {
+		opts.flags |= O_DIRECT;
+	}
+	if (xnvme_flags & XNVME_FILE_OFLG_RDONLY) {
+		opts.flags |= O_RDONLY;
+	}
+	if (xnvme_flags & XNVME_FILE_OFLG_WRONLY) {
+		opts.flags |= O_WRONLY;
+	}
+	if (xnvme_flags & XNVME_FILE_OFLG_RDWR) {
+		opts.flags |= O_RDWR;
+	}
+
+	return opts;
+}
+
 int
 xnvme_be_linux_dev_from_ident(const struct xnvme_ident *ident, struct xnvme_dev **dev)
 {
+	struct xnvme_be_linux_opts opts = xnvme_be_linux_parse_opts(ident);
 	int err;
 
 	err = xnvme_dev_alloc(dev);
@@ -410,9 +507,10 @@ xnvme_be_linux_dev_from_ident(const struct xnvme_ident *ident, struct xnvme_dev 
 	(*dev)->ident = *ident;
 	(*dev)->be = xnvme_be_linux;
 
-	// TODO: determine nsid, csi, and device-type
+	// TODO: interpret `ident->opts` and init `xnvme_flags` properly
 
-	err = xnvme_be_linux_state_init(*dev, NULL);
+	// TODO: determine nsid, csi, and device-type
+	err = xnvme_be_linux_state_init(*dev, &opts);
 	if (err) {
 		XNVME_DEBUG("FAILED: xnvme_be_linux_state_init()");
 		free(*dev);

@@ -9,10 +9,11 @@
 #endif
 
 /**
- * @enum xnvme_be_linux_opts
+ * Internal representation of options for Linux backends
  */
-enum xnvme_be_linux_opts {
-	XNVME_BE_LINUX_WRITABLE = 0x1, ///< XNVME_BE_LINUX_WRITABLE
+struct xnvme_be_linux_opts {
+	int flags;
+	int mode;
 };
 
 /**
