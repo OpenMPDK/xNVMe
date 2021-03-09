@@ -346,6 +346,8 @@ set(XNVME_BE_LINUX_BLOCK_ENABLED ${LINUX} CACHE BOOL
 	"be_linux_block: support for non-NVMe devices via the Linux Block Layer")
 set(XNVME_BE_LINUX_BLOCK_ZONED_ENABLED ${LINUX} CACHE BOOL
 	"be_linux_block_zoned: support Linux Zoned Block Devices")
+set(XNVME_BE_LINUX_FS_ENABLED ${LINUX} CACHE BOOL
+	"be_linux_fs: support for traditional file-system file-IO via the Linux Block Layer")
 
 # TODO: consider expanding compile-time checking of Linux Block layer features
 if(XNVME_BE_LINUX_BLOCK_ZONED_ENABLED)
@@ -367,6 +369,10 @@ set(LIBURING_LIBRARY_PATH
 if(XNVME_BE_LINUX_ENABLED)
 
 	add_definitions(-DXNVME_BE_LINUX_ENABLED)
+
+	if(XNVME_BE_LINUX_FS_ENABLED)
+		add_definitions(-DXNVME_BE_LINUX_FS_ENABLED)
+	endif()
 
 	if(XNVME_BE_LINUX_BLOCK_ENABLED)
 		add_definitions(-DXNVME_BE_LINUX_BLOCK_ENABLED)
