@@ -96,7 +96,10 @@ _linux_aio_poke(struct xnvme_queue *q, uint32_t max)
 			XNVME_DEBUG("FAILED: res: %lu, res2: %lu", ev->res, ev->res2);
 			ctx->cpl.status.sc =  -ev->res;
 			ctx->cpl.status.sct = XNVME_STATUS_CODE_TYPE_VENDOR;
+		} else {
+			ctx->cpl.result = ev->res;
 		}
+
 		ctx->async.cb(ctx, ctx->async.cb_arg);
 	}
 
