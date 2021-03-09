@@ -427,6 +427,7 @@ xnvme_be_dev_derive_geometry(struct xnvme_dev *dev)
 
 	case XNVME_DEV_TYPE_BLOCK_DEVICE:
 	case XNVME_DEV_TYPE_NVME_NAMESPACE:
+	case XNVME_DEV_TYPE_FS_FILE:
 		switch (dev->csi) {
 		case XNVME_SPEC_CSI_ZONED:
 			if (_zoned_geometry(dev)) {
