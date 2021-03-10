@@ -228,7 +228,8 @@ _linux_iou_cmd_io(struct xnvme_cmd_ctx *ctx, void *dbuf, size_t dbuf_nbytes, voi
 {
 	struct xnvme_queue_iou *queue = (void *)ctx->async.queue;
 	struct xnvme_be_linux_state *state = (void *)queue->base.dev->be.state;
-	const uint64_t ssw = queue->base.dev->ssw;
+	const uint64_t ssw = (queue->base.dev->dtype == XNVME_DEV_TYPE_FS_FILE) ? \
+			     0 : queue->base.dev->ssw;
 	struct io_uring_sqe *sqe = NULL;
 
 	int opcode = IORING_OP_NOP;
