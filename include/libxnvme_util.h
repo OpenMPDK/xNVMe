@@ -204,6 +204,32 @@ XNVME_MIN(int x, int y)
 }
 
 /**
+* Calculate the minimum of the given `x` and `y`
+*
+* @param x
+* @param y
+* @return The maximum of `x` and `y`
+*/
+static inline uint64_t
+XNVME_MIN_U64(uint64_t x, uint64_t y)
+{
+	return x < y ? x : y;
+}
+
+/**
+* Calculate the minimum of the given `x` and `y`
+*
+* @param x
+* @param y
+* @return The maximum of `x` and `y`
+*/
+static inline int64_t
+XNVME_MIN_S64(int64_t x, int64_t y)
+{
+	return x < y ? x : y;
+}
+
+/**
  * Calculate the maximum of the given `x` and `y`
  *
  * @param x
