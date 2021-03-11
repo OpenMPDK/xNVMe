@@ -8,6 +8,30 @@
 #include <libxnvme_file.h>
 
 #define IOSIZE_DEF 4096
+#define QDEPTH_MAX 256
+#define QDEPTH_DEF 16
+
+struct cb_args {
+	uint64_t nerrors;
+	uint64_t ncompletions;
+	uint64_t nsubmissions;
+};
+
+static void
+cb_func(struct xnvme_cmd_ctx *ctx, void *cb_arg)
+{
+	struct cb_args *work = cb_arg;
+
+	work->ncompletions += 1;
+
+	if (xnvme_cmd_ctx_cpl_status(ctx)) {
+		xnvmec_perr("cb_func()", errno);
+		xnvme_cmd_ctx_pr(ctx, XNVME_PR_DEF);
+		work->nerrors += 1;
+	}
+
+	xnvme_queue_put_cmd_ctx(ctx->async.queue, ctx);
+}
 
 int
 read_write(struct xnvmec *cli)
@@ -112,6 +136,104 @@ exit:
 	return 0;
 }
 
+int
+dump_async(struct xnvmec *cli)
+{
+	const char *fpath;
+	struct xnvme_dev *fh;
+	int flags;
+	size_t buf_nbytes, tbytes, iosize;
+	char *buf;
+
+	struct cb_args cb_args = { 0 };
+	struct xnvme_queue *queue = NULL;
+	uint32_t qdepth;
+	int err;
+
+	fpath = cli->args.data_output;
+	flags = XNVME_FILE_OFLG_CREATE | XNVME_FILE_OFLG_WRONLY;
+	flags |= cli->given[XNVMEC_OPT_DIRECT] ? XNVME_FILE_OFLG_DIRECT_ON : 0x0;
+	iosize = cli->given[XNVMEC_OPT_IOSIZE] ? cli->args.iosize : IOSIZE_DEF;
+	qdepth = cli->given[XNVMEC_OPT_QDEPTH] ? cli->args.qdepth : QDEPTH_DEF;
+
+	fh = xnvme_file_open(fpath, flags);
+	if (fh == NULL) {
+		xnvmec_perr("xnvme_file_open(fh)", errno);
+		return errno;
+	}
+	tbytes = cli->args.data_nbytes;
+
+	buf_nbytes = tbytes;
+	buf = xnvme_buf_alloc(fh, buf_nbytes);
+	if (!buf) {
+		xnvmec_perr("xnvme_buf_alloc()", errno);
+		goto exit;
+	}
+	xnvmec_buf_fill(buf, buf_nbytes, "anum");
+
+	err = xnvme_queue_init(fh, qdepth, 0, &queue);
+	if (err) {
+		xnvmec_perr("xnvme_queue_init()", err);
+		goto exit;
+	}
+	xnvme_queue_set_cb(queue, cb_func, &cb_args);
+
+	xnvmec_pinf("dump-async{fpath: %s, tbytes: %zu, buf_nbytes: %zu, iosize: %zu, qdepth: %d}",
+		    fpath, tbytes, buf_nbytes, iosize, qdepth);
+
+	xnvmec_timer_start(cli);
+
+	for (size_t ofz = 0; (ofz < tbytes) && !cb_args.nerrors;) {
+		struct xnvme_cmd_ctx *ctx = xnvme_queue_get_cmd_ctx(queue);
+		size_t nbytes = XNVME_MIN_U64(iosize, tbytes - ofz);
+		ssize_t res;
+
+submit:
+		res = xnvme_file_pwrite(ctx, buf + ofz, nbytes, ofz);
+		switch (res) {
+		case 0:
+			cb_args.nsubmissions += 1;
+			goto next;
+
+		case -EBUSY:
+		case -EAGAIN:
+			xnvme_queue_poke(queue, 0);
+			goto submit;
+
+		default:
+			xnvmec_perr("submission-error", err);
+			xnvme_queue_put_cmd_ctx(queue, ctx);
+			goto exit;
+		}
+
+next:
+		ofz += iosize;
+	}
+
+	err = xnvme_queue_wait(queue);
+	if (err < 0) {
+		xnvmec_perr("xnvme_queue_wait()", err);
+		goto exit;
+	}
+
+	xnvmec_timer_stop(cli);
+	xnvmec_timer_bw_pr(cli, "wall-clock", tbytes);
+
+exit:
+	xnvmec_pinf("cb_args: {nsubmissions: %zu, ncompletions: %zu, nerrors: %zu}",
+		    cb_args.nsubmissions, cb_args.ncompletions, cb_args.nerrors);
+	if (queue) {
+		int err_exit = xnvme_queue_term(queue);
+		if (err_exit) {
+			xnvmec_perr("xnvme_queue_term()", err_exit);
+		}
+	}
+
+	xnvme_buf_free(fh, buf);
+	xnvme_file_close(fh);
+	return 0;
+}
+
 static struct xnvmec_sub g_subs[] = {
 	{
 		"write-read", "Write and read a file",
@@ -126,6 +248,16 @@ static struct xnvmec_sub g_subs[] = {
 			{XNVMEC_OPT_DATA_OUTPUT, XNVMEC_POSA},
 			{XNVMEC_OPT_DATA_NBYTES, XNVMEC_LREQ},
 			{XNVMEC_OPT_IOSIZE, XNVMEC_LOPT},
+			{XNVMEC_OPT_DIRECT, XNVMEC_LFLG},
+		}
+	},
+	{
+		"dump-async", "Write a buffer of 'data-nbytes' to file --data-output",
+		"Write a buffer of 'data-nbytes' to file --data-output", dump_async, {
+			{XNVMEC_OPT_DATA_OUTPUT, XNVMEC_POSA},
+			{XNVMEC_OPT_DATA_NBYTES, XNVMEC_LREQ},
+			{XNVMEC_OPT_IOSIZE, XNVMEC_LOPT},
+			{XNVMEC_OPT_QDEPTH, XNVMEC_LOPT},
 			{XNVMEC_OPT_DIRECT, XNVMEC_LFLG},
 		}
 	},
