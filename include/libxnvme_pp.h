@@ -214,9 +214,9 @@ int
 xnvme_geo_pr(const struct xnvme_geo *geo, int opts);
 
 /**
- * Prints a humanly readable representation the given #xnvme_req
+ * Prints a humanly readable representation the given #xnvme_cmd_ctx
  *
- * @param ctx Pointer to the #xnvme_req to print
+ * @param ctx Pointer to the #xnvme_cmd_ctx to print
  * @param UNUSED_opts Printer options
  */
 void
