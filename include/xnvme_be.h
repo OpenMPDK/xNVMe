@@ -190,8 +190,15 @@ path_to_ll(const char *path, uint64_t *val);
 bool
 xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt, uint32_t *val);
 
+/**
+ * Copies an option value to the given buf
+ *
+ * The given 'opts' string is on the form "?opt1=val_x?opt2=val_y"
+ * The given 'opt' is a string on  the form "opt2"
+ * The provided 'buf' must contain atleast 'buf_len' bytes of memory
+ */
 bool
-xnvme_ident_opt_to_char_val(const struct xnvme_ident *ident, const char *opt, const char *val);
+xnvme_ident_optval_to_buf(const char *opts, const char *opt, char *buf, uint32_t buf_len);
 
 bool
 check_cmask_validity(const char *cmask, int nproc);

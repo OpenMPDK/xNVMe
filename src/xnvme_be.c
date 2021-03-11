@@ -96,21 +96,33 @@ xnvme_ident_opt_to_val(const struct xnvme_ident *ident, const char *opt, uint32_
 }
 
 bool
-xnvme_ident_opt_to_char_val(const struct xnvme_ident *ident, const char *opt,
-			    const char *val)
+xnvme_ident_optval_to_buf(const char *opts, const char *opt, char *buf, uint32_t buf_len)
 {
-	char *ofz = NULL;
-	char fmt[100] = { 0 };
+	char haystack[XNVME_IDENT_OPTS_LEN] = { 0 };
 
-	ofz = strstr(ident->opts, opt);
-	if (!ofz) {
+	if (strlen(opts) > (XNVME_IDENT_OPTS_LEN - 1)) {
 		return false;
 	}
-	ofz = strtok(ofz, "?");
+	if (strlen(opt) > XNVME_IDENT_OPT_MAX) {
+		return false;
+	}
+	if (buf_len < (strlen(opt) + 32)) {
+		return false;
+	}
 
-	sprintf(fmt, "%s=%%s", opt);
+	snprintf(haystack, XNVME_IDENT_OPTS_LEN, "%s", opts);
 
-	return sscanf(ofz, fmt, val) == 1;
+	for (char *tok = strtok(haystack, "?"); tok; tok = strtok(NULL, "?")) {
+		char fmt[100] = { 0 };
+
+		snprintf(fmt, sizeof(fmt), "%s=%%%d[a-z_0123456789]", opt, (int)(buf_len - 1));
+
+		if (sscanf(tok, fmt, buf) == 1) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool

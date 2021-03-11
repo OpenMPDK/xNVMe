@@ -436,7 +436,7 @@ xnvme_be_linux_parse_opts(const struct xnvme_ident *ident)
 	struct xnvme_be_linux_opts opts = { 0 };
 
 	uint32_t create, direct, rdonly, wronly, rdwr = 0;
-	char cmask[5];
+	char cmask[12];
 
 	int xnvme_flags = 0;
 	if (xnvme_ident_opt_to_val(ident, "create", &create) && create) {
@@ -470,7 +470,7 @@ xnvme_be_linux_parse_opts(const struct xnvme_ident *ident)
 		xnvme_flags |= XNVME_FILE_OFLG_RDWR;
 	}
 
-	if (xnvme_ident_opt_to_char_val(ident, "cmask", cmask)) {
+	if (xnvme_ident_optval_to_buf(ident->opts, "cmask", cmask, sizeof(cmask) - 1)) {
 		opts.mode = strtol(cmask, NULL, 8);
 	}
 

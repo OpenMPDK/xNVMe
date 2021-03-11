@@ -924,7 +924,7 @@ xnvme_be_spdk_state_init(struct xnvme_dev *dev)
 	if (!xnvme_ident_opt_to_val(&dev->ident, "shm_id", &shm_id)) {
 		XNVME_DEBUG("!xnvme_ident_opt_to_val(opt:shm_id)");
 	}
-	if (!xnvme_ident_opt_to_char_val(&dev->ident, "cmask", cmask)) {
+	if (!xnvme_ident_optval_to_buf(dev->ident.opts, "cmask", cmask, sizeof(cmask) - 1)) {
 		XNVME_DEBUG("!xnvme_ident_opt_to_char_val(opt:cmask)");
 		cmask_valid = false;
 	}
