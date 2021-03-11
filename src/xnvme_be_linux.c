@@ -253,7 +253,7 @@ xnvme_be_linux_state_init(struct xnvme_dev *dev, void *opts)
 		return -EINVAL;
 	}
 
-	XNVME_DEBUG("INFO: selected sync: '%s'", dev->be.sync.id);
+	XNVME_DEBUG("INFO: using sync: '%s'", dev->be.sync.id);
 	if (!(dev->be.sync.enabled && dev->be.sync.supported(dev, 0x0))) {
 		XNVME_DEBUG("FAILED: skipping, !enabled || !supported");
 		return -ENOSYS;
@@ -261,24 +261,26 @@ xnvme_be_linux_state_init(struct xnvme_dev *dev, void *opts)
 
 	// Determine async-engine to use and setup the func-pointers
 	{
-		char aname[10] = { 0 };
-		uint8_t chosen;
+		char aname[64] = { 0 };
+		bool user_choice;
 
-		chosen = sscanf(dev->ident.opts, "?async=%9[a-z_]", aname) == 1;
+		user_choice = xnvme_ident_optval_to_buf(dev->ident.opts, "async", aname,
+							sizeof(aname) - 1);
 
 		for (int i = 0; i < g_linux_async_count; ++i) {
 			struct xnvme_be_async *queue = g_linux_async[i];
 
-			if (chosen && strncmp(aname, queue->id,
-					      XNVME_MIN(strnlen(queue->id, 9), 9))) {
-				XNVME_DEBUG("chosen: %s != queue->id: %s",
-					    aname, queue->id);
+			if (user_choice && strncmp(aname, queue->id,
+						   XNVME_MIN(strnlen(queue->id, sizeof(aname) - 1),
+							     sizeof(aname) - 1))) {
+				XNVME_DEBUG("INFO: aname: '%s' != queue->id: '%s'", aname,
+					    queue->id);
 				continue;
 			}
 
 			if (queue->enabled && queue->supported(dev, 0x0)) {
 				dev->be.async = *queue;
-				XNVME_DEBUG("got: %s", queue->id);
+				XNVME_DEBUG("INFO: using '%s'", queue->id);
 				break;
 			}
 		}
@@ -289,7 +291,7 @@ xnvme_be_linux_state_init(struct xnvme_dev *dev, void *opts)
 		return -ENOSYS;
 	}
 
-	XNVME_DEBUG("INFO: selected async: '%s'", dev->be.async.id);
+	XNVME_DEBUG("INFO: using async: '%s'", dev->be.async.id);
 
 	return 0;
 }
