@@ -17,12 +17,13 @@ extern "C" {
 #include <libxnvme_util.h>
 
 #define XNVME_IDENT_URI_LEN 384
-#define XNVME_IDENT_URI_LEN_MIN 10
 
 #define XNVME_IDENT_SCHM_LEN 5
 #define XNVME_IDENT_TRGT_LEN 155
 #define XNVME_IDENT_OPTS_LEN 160
 #define XNVME_IDENT_OPTS_SEP '?'
+
+#define XNVME_IDENT_URI_LEN_MIN (XNVME_IDENT_SCHM_LEN + 1)
 
 /**
  * Representation of device identifiers once decoded from text-representation
