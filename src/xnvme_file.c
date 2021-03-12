@@ -9,7 +9,7 @@
 #include <xnvme_be_linux.h>
 
 
-ssize_t
+int
 xnvme_file_pread(struct xnvme_cmd_ctx *ctx, void *buf, size_t count, off_t offset)
 {
 	ctx->cmd.common.opcode = XNVME_SPEC_NVM_OPC_READ;
@@ -19,7 +19,7 @@ xnvme_file_pread(struct xnvme_cmd_ctx *ctx, void *buf, size_t count, off_t offse
 	return xnvme_cmd_pass(ctx, buf, count, NULL, 0);
 }
 
-ssize_t
+int
 xnvme_file_pwrite(struct xnvme_cmd_ctx *ctx, void *buf, size_t count, off_t offset)
 {
 	// TODO: consider returning -EINVAL when mbuf is provided and namespace

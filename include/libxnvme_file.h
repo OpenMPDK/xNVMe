@@ -67,7 +67,7 @@ xnvme_file_close(struct xnvme_dev *fh);
  *
  * @return On success, 0 is returned. On error, negative `errno` is returned.
  */
-ssize_t
+int
 xnvme_file_pread(struct xnvme_cmd_ctx *ctx, void *buf, size_t count, off_t offset);
 
 /**
@@ -86,7 +86,7 @@ xnvme_file_pread(struct xnvme_cmd_ctx *ctx, void *buf, size_t count, off_t offse
  *
  * @return On success, 0 is returned. On error, negative `errno` is returned.
  */
-ssize_t
+int
 xnvme_file_pwrite(struct xnvme_cmd_ctx *ctx, void *buf, size_t count, off_t offset);
 
 /**
