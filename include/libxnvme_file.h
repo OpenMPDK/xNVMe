@@ -36,7 +36,8 @@ enum XNVME_FILE_OFLG {
  * @param pathname Path to the file
  * @param flags Mode of operation for the given file, one of #XNVME_FILE_OFLG
  *
- * @return On success, 0 is returned. On error, negative `errno` is returned.
+ * @return On success, an initialized struct xnvme_dev is returned. On error,
+ * NULL is returned.
  */
 struct xnvme_dev *
 xnvme_file_open(const char *pathname, int flags);
