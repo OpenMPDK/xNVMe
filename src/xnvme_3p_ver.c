@@ -7,12 +7,12 @@ const char *xnvme_3p_ver[] = {
 	"libnvme;NOSYS",
 #endif
 #ifdef XNVME_BE_LINUX_IOU_ENABLED
-	"liburing;git-describe:liburing-0.7",
+	"liburing;git-describe:liburing-2.0",
 #else
 	"liburing;NOSYS",
 #endif
 #ifdef XNVME_BE_SPDK_ENABLED
-	"spdk;git-describe:v20.10;+patches",
+	"spdk;git-describe:v21.01.1;+patches",
 #else
 	"spdk;NOSYS",
 #endif
