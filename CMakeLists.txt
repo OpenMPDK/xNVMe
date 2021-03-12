@@ -125,6 +125,11 @@ if(XNVME_TRACE_ENABLED)
 	add_definitions(-DXNVME_TRACE_ENABLED)
 endif()
 
+set(XNVME_YSNP_ENABLED FALSE CACHE BOOL "Enable YSNP-checking")
+if(XNVME_YSNP_ENABLED)
+	add_definitions(-DXNVME_YSNP_ENABLED)
+endif()
+
 #
 # NOTE: CMake prefers that filenames are hard-coded in CMakeLists.txt and not
 # globbed as it cannot detect, in the build-files genereated by CMake, when a
