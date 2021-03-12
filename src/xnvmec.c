@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <libxnvmec.h>
+#include <libxnvme_file.h>
 
 const char *
 xnvmec_opt_type_str(enum xnvmec_opt_type otype)
@@ -44,39 +45,55 @@ xnvmec_buf_clear(void *buf, size_t nbytes)
 static int
 fdio_func(void *buf, size_t nbytes, const char *path, int flags, mode_t mode)
 {
-	const int do_write = flags & O_WRONLY;
+	const int do_write = flags & XNVME_FILE_OFLG_WRONLY;
 	size_t transferred = 0;
-	int hnd, err;
+	struct xnvme_dev *fh = NULL;
+	struct xnvme_cmd_ctx ctx = { 0 };
+	char uri[XNVME_IDENT_URI_LEN] = { 0 };
+	int err = 0;
 
-	hnd = open(path, flags, mode);
-	if (hnd == -1) {
+	// Build xNVMe URI to pass mode along
+	err = snprintf(uri, XNVME_IDENT_URI_LEN - 1, "%s?cmask=%05o", path, mode);
+	if (err < 0 || (err >= (int)XNVME_IDENT_URI_LEN - 1)) {
+		XNVME_DEBUG("FAILED: constructing uri");
+		return err;
+	}
+
+	fh = xnvme_file_open(uri, flags);
+	if (fh == NULL) {
 		XNVME_DEBUG("FAILED: open(), errno: %d", errno);
 		return -errno;
 	}
 
+	ctx = xnvme_file_get_cmd_ctx(fh);
+
 	while (transferred < nbytes) {
 		const size_t remain = nbytes - transferred;
 		size_t nbytes_call = remain < SSIZE_MAX ? remain : SSIZE_MAX;
-		ssize_t ret;
 
-		ret = do_write ? write(hnd, buf + transferred, nbytes_call) : \
-		      read(hnd, buf + transferred, nbytes_call);
-		if (do_write ? ret <= 0 : ret < 0) {
-			XNVME_DEBUG("FAILED: do_write: %d, ret: %ld, errno: %d",
-				    do_write, ret, errno);
-			close(hnd);
+		if (do_write) {
+			err = xnvme_file_pwrite(&ctx, buf + transferred, nbytes_call,
+						transferred);
+		} else {
+			err = xnvme_file_pread(&ctx, buf + transferred, nbytes_call,
+					       transferred);
+		}
+		if (err) {
+			XNVME_DEBUG("FAILED: do_write: %d, cpl.result: %ld, errno: %d",
+				    do_write, ctx.cpl.result, errno);
+			xnvme_file_close(fh);
 			return -errno;
 		}
 
 		// when reading, break at end of file
-		if (!do_write && ret == 0) {
+		if (!do_write && ctx.cpl.result == 0) {
 			break;
 		}
 
-		transferred += ret;
+		transferred += ctx.cpl.result;
 	}
 
-	err = close(hnd);
+	err = xnvme_file_close(fh);
 	if (err) {
 		XNVME_DEBUG("FAILED: do_write: %d, err: %d, errno: %d",
 			    do_write, err, errno);
@@ -89,13 +106,13 @@ fdio_func(void *buf, size_t nbytes, const char *path, int flags, mode_t mode)
 int
 xnvmec_buf_from_file(void *buf, size_t nbytes, const char *path)
 {
-	return fdio_func(buf, nbytes, path, O_RDONLY, 0x0);
+	return fdio_func(buf, nbytes, path, XNVME_FILE_OFLG_RDONLY, 0x0);
 }
 
 int
 xnvmec_buf_to_file(void *buf, size_t nbytes, const char *path)
 {
-	return fdio_func(buf, nbytes, path, O_CREAT | O_TRUNC | O_WRONLY,
+	return fdio_func(buf, nbytes, path, XNVME_FILE_OFLG_CREATE | XNVME_FILE_OFLG_WRONLY,
 			 S_IWUSR | S_IRUSR);
 }
 
