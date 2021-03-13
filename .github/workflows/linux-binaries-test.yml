@@ -231,45 +231,19 @@ jobs:
         ssh::cmd "xnvme library-info || true"
         ssh::cmd "xnvme enum || true"
 
-    - name: CIJOE/QEMU, testplan xnvme-linux-bd-zcs.plan
+    - name: CIJOE/QEMU, run testplans
       if: always()
       run: |
         source /opt/scripts/suitup.sh
         cij_runner \
-          $CIJ_TESTPLANS/xnvme-linux-bd-zcs.plan \
-          ${TARGET_ENV} --output ${RESULTS}/bd/zcs
-
-    - name: CIJOE/QEMU, testplan xnvme-linux-bd-ncs.plan
-      if: always()
-      run: |
-        source /opt/scripts/suitup.sh
-        cij_runner \
+          --testplan \
           $CIJ_TESTPLANS/xnvme-linux-bd-ncs.plan \
-          ${TARGET_ENV} --output ${RESULTS}/bd/ncs
-
-    - name: CIJOE/QEMU, testplan xnvme-linux-nvme-base.plan
-      if: always()
-      run: |
-        source /opt/scripts/suitup.sh
-        cij_runner \
+          $CIJ_TESTPLANS/xnvme-linux-bd-zcs.plan \
           $CIJ_TESTPLANS/xnvme-linux-nvme-base.plan \
-          ${TARGET_ENV} --output ${RESULTS}/nvme/base
-
-    - name: CIJOE/QEMU, testplan xnvme-linux-nvme-ncs.plan
-      if: always()
-      run: |
-        source /opt/scripts/suitup.sh
-        cij_runner \
           $CIJ_TESTPLANS/xnvme-linux-nvme-ncs.plan \
-          ${TARGET_ENV} --output ${RESULTS}/nvme/ncs
-
-    - name: CIJOE/QEMU, testplan xnvme-linux-nvme-zcs.plan
-      if: always()
-      run: |
-        source /opt/scripts/suitup.sh
-        cij_runner \
           $CIJ_TESTPLANS/xnvme-linux-nvme-zcs.plan \
-          ${TARGET_ENV} --output ${RESULTS}/nvme/zcs
+          --env ${TARGET_ENV} \
+          --output ${RESULTS}
 
     - name: CIJOE/QEMU, kill the guest
       if: always()
@@ -285,11 +259,7 @@ jobs:
       if: always()
       run: |
         source /opt/scripts/suitup.sh
-        cij_reporter ${RESULTS}/bd/ncs
-        cij_reporter ${RESULTS}/bd/zcs
-        cij_reporter ${RESULTS}/nvme/base
-        cij_reporter ${RESULTS}/nvme/ncs
-        cij_reporter ${RESULTS}/nvme/zcs
+        cij_reporter --output ${RESULTS}
 
     - name: CIJOE, upload test results and report
       uses: actions/upload-artifact@v2
