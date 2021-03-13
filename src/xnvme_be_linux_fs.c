@@ -104,13 +104,9 @@ _idfy(struct xnvme_cmd_ctx *ctx, void *dbuf)
 	case XNVME_SPEC_IDFY_NS_IOCS:
 	case XNVME_SPEC_IDFY_CTRLR_IOCS:
 	default:
-		goto failed;
+		break;
 	}
 
-	ctx->cpl.status.val = 0;
-	return 0;
-
-failed:
 	///< TODO: set some appropriate status-code for other idfy-cmds
 	ctx->cpl.status.sc = 0x3;
 	ctx->cpl.status.sct = 0x3;
