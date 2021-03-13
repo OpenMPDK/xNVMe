@@ -46,6 +46,24 @@ Known Issues
     means, as a user that you must sent non-read/write commands with mode
     ``XNVME_CMD_SYNC``.
 
+v0.0.24
+-------
+
+This release contains updates to third-party repositories along with any
+changes nescesarry for xNVMe due to third-party changes.
+
+* SPDK
+  - Updated to v21.01.1
+  - Dropped IOCS and ZNS bdev/fabrics patches
+  - Adjusted to the introduction of the VFIO transport
+
+* liburing
+  - updated to v2.0
+  - Adjusted to the change in size of the uring-queue
+
+* fio
+  - Not updated, due to a compiler-warning breaking the xNVMe build
+
 v0.0.23
 -------
 
