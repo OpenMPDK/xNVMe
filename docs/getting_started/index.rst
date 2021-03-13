@@ -183,6 +183,11 @@ For example, from the root of the **xNVMe** source repository, do:
 Ubuntu 16.04 (Xenial)
 ---------------------
 
+**Ubunt 16.04 / Xenial is EOL in April 2021**
+
+The following, might still work, however, you should expect issues on this
+non-supported distribution.
+
 Install the following packages via ``apt-get``:
 
 .. literalinclude:: ../../scripts/pkgs/ubuntu:xenial.txt
