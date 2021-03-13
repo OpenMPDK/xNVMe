@@ -117,7 +117,10 @@ bool
 check_cmask_validity(const char *cmask, int nproc)
 {
 	char string[100];
-	sscanf(cmask, "%s", string);
+
+	if (sscanf(cmask, "%s", string) != 0) {
+		return false;
+	}
 
 	char *token = strtok(string, "[,-]");
 	while (token != NULL) {
