@@ -4,11 +4,12 @@
 
 project(
   'xnvme',
-  'c',
+  'c', 'cpp',
   version: '0.7.4',
   license: 'BSD-3-Clause',
   default_options: [
     'c_std=gnu11',
+    'cpp_std=c++11',
     'warning_level=2',
     'buildtype=release',
     'default_library=both',
@@ -39,9 +40,17 @@ cc_flags = [
   '-Wno-cast-function-type',
   '-Wno-strict-aliasing'
 ]
+
+cxx = meson.get_compiler('cpp')
+cxx_flags = [
+  '-Wno-missing-braces',
+  '-Wno-cast-function-type',
+  '-Wno-strict-aliasing'
+]
+
 add_project_arguments(
   cc.get_supported_arguments(cc_flags),
-  language: 'c'
+  language: ['c', 'cpp']
 )
 
 add_project_arguments('-Db_lto='+ (not is_windows).to_string(), language: 'c')
@@ -171,6 +180,7 @@ configure_file(
 
 # Provide configuration via header-file 'xnvme_config.h'
 add_global_arguments(['-include', 'xnvme_config.h'], language: 'c')
+add_global_arguments(['-include', 'xnvme_config.h'], language: 'cpp')
 
 # bash-completions: run the Makefile target 'make gen-bash-completions' to update the completions
 bash_completion_dep = dependency(
@@ -249,7 +259,7 @@ subdir('lib')
 if get_option('tests')
   subdir('tests')
   subdir('man/tests')
-  if install_completions 
+  if install_completions
      subdir('toolbox/bash_completion.d/tests')
   endif
 endif
