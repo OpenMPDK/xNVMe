@@ -13,9 +13,9 @@ echo "# Inspect the device"
 xnvme info "${NVMET_TRADDR}:${NVMET_TRSVCID}" --dev-nsid="${NVMET_SUBSYS_NSID}"
 
 echo "# Run fio"
-"${XNVME_REPOS}/subprojects/fio/fio" \
+"${FIO_REPOS}/fio" \
   /usr/local/share/xnvme/xnvme-compare.fio \
   --section=default \
-  --ioengine="external:$(pkg-config xnvme --variable=libdir)/libxnvme-fio-engine.so" \
+  --ioengine="xnvme" \
   --filename="${NVMET_TRADDR}\\:${NVMET_TRSVCID}" \
   --xnvme_dev_nsid=1

@@ -1,0 +1,44 @@
+#
+# Clone, build and install spdk
+#
+# Assumptions:
+#
+# - These commands are executed with sufficient privileges (sudo/root)
+#
+git clone https://github.com/spdk/spdk.git toolbox/third-party/spdk/repository
+
+pushd toolbox/third-party/spdk/repository 
+git checkout v23.05
+git submodule update --init --recursive
+
+./configure \
+  --disable-tests \
+  --disable-unit-tests \
+  --disable-examples \
+  --disable-apps \
+  --without-crypto \
+  --without-fuse \
+  --without-idxd \
+  --without-iscsi-initiator \
+  --without-nvme-cuse \
+  --without-ocf \
+  --without-rbd \
+  --without-uring \
+  --without-usdt \
+  --without-vhost \
+  --without-vtune \
+  --without-virtio \
+  --without-xnvme \
+  --with-shared \
+  --with-dpdk=/usr \
+  --prefix=/usr
+
+gmake
+gmake install
+
+# SPDK doesn't install to the correct pkg-config directory - thus they need to be moved manually
+# Alternatively use the command 'export PKG_CONFIG_PATH=/usr/libdata/pkgconfig'
+
+cp /usr/lib/pkgconfig/spdk* /usr/libdata/pkgconfig/
+
+popd

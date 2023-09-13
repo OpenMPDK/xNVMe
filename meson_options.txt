@@ -17,10 +17,6 @@ option('examples', type: 'boolean', value: true)
 option('tests', type: 'boolean', value: true)
 option('tools', type: 'boolean', value: true)
 
-option('shared_library', type: 'boolean', value: true)
-
-option('build_subprojects', type : 'boolean', value : true, yield : true)
-
 option('enable-ysnp', type: 'boolean', value: true)
 
 option('manpages', type: 'boolean', value: true, description: 'Install manpages for all CLI tools/examples/tests')

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export LDFLAGS="-ltinfo -lncurses"
 
-# configure xNVMe and build meson subprojects(SPDK)
+# configure xNVMe
 meson setup builddir --prefix=/usr
 
 # build xNVMe

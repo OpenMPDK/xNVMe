@@ -28,7 +28,7 @@ echo "# Inspect it, using xNVMe"
 xnvme info /dev/nvme1n1
 
 echo "# Run fio"
-"${XNVME_REPOS}/subprojects/fio/fio" \
+"${FIO_REPOS}/fio" \
   /usr/local/share/xnvme/xnvme-compare.fio \
   --section=default \
   --ioengine="io_uring" \

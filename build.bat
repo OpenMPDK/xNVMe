@@ -166,9 +166,8 @@ goto :eof
 :clobber
 	@call :clean
 	@echo "## xNVMe: clobber"
-	@git clean -dfx
+	%SH% -c "rm -fr %BUILD_DIR% || true"
 	@git clean -dfX
 	@git checkout .
-	@rmdir /s /q subprojects\fio
 	@echo "## xNVMe: clobber [DONE]"
 	@goto :eof

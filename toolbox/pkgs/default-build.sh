@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# configure xNVMe and build meson subprojects(SPDK)
-meson setup builddir
+# configure xNVMe
+meson setup builddir --prefix=/usr
 
 # build xNVMe
 meson compile -C builddir

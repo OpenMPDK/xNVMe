@@ -1,0 +1,18 @@
+#
+# Clone, build and install pkgconf and symlink to pkg-config
+#
+# Assumptions:
+#
+# - These commands are executed with sufficient privileges (sudo/root)
+#
+git clone https://github.com/pkgconf/pkgconf.git
+cd pkgconf
+git checkout pkgconf-2.0.1
+
+meson setup builddir --prefix=/usr -Dtests=disabled
+
+meson compile -C builddir
+meson install -C builddir
+
+ln -sf pkgconf /usr/bin/pkg-config
+cd ..

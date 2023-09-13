@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-meson.add_dist_script('meson_dist_archive_fixer.py')
-
 if not is_windows
   xnvmescript_driver = custom_target(
     'xnvme-driver-script',

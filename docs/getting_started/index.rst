@@ -626,15 +626,7 @@ Build Errors
 ------------
 
 If you are getting errors while attempting to configure and build **xNVMe**
-then it is likely due to one of the following:
-
-* You are building in an **offline** environment and only have a shallow
-  source-archive or a git-repository without subprojects.
-
-The full source-archive is made available with each release and downloadable
-from the `GitHUB Release page <https://github.com/OpenMPDK/xNVMe/releases>`_
-release page. It contains the xNVMe source code along with all the third-party
-dependencies, namely: SPDK, liburing, libnvme, and fio.
+then it is likely due to: 
 
 **missing dependencies / toolchain**
 

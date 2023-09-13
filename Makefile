@@ -294,18 +294,8 @@ clean:
 	rm -fr $(BUILD_DIR) || true
 	@echo "## xNVMe: make clean [DONE]"
 
-define clean-subprojects-help
-# Remove Meson builddir as well as running 'make clean' in all subprojects
-endef
-.PHONY: clean-subprojects
-clean-subprojects:
-	@echo "## xNVMe: make clean-subprojects"
-	@if [ -d "subprojects/spdk" ] && [ ${PLATFORM_ID} != 'Darwin' ]; then cd subprojects/spdk &&$(MAKE) clean; fi;
-	rm -fr $(BUILD_DIR) || true
-	@echo "## xNVMe: make clean-subprojects [DONE]"
-
 define gen-libconf-help
-# Helper-target generating third-party/subproject/os/library-configuration string
+# Helper-target generating library-configuration string
 endef
 .PHONY: gen-libconf
 gen-libconf:
@@ -319,8 +309,8 @@ endef
 .PHONY: gen-src-archive
 gen-src-archive:
 	@echo "## xNVMe: make gen-src-archive"
-	$(MESON) setup $(BUILD_DIR) -Dbuild_subprojects=false -Dwith-liburing=disabled -Dwith-libvfn=disabled
-	$(MESON) dist -C $(BUILD_DIR) --include-subprojects --no-tests --formats gztar
+	$(MESON) setup $(BUILD_DIR) -Dwith-spdk=false -Dwith-liburing=disabled -Dwith-libvfn=disabled
+	$(MESON) dist -C $(BUILD_DIR) --no-tests --formats gztar
 	@echo "## xNVMe: make gen-src-archive [DONE]"
 
 define gen-artifacts-help
@@ -379,7 +369,6 @@ tags:
 		tools \
 		examples \
 		tests \
-		subprojects/* \
 		|| true
 	@echo "## xNVMe: make tags [DONE]"
 
@@ -413,7 +402,7 @@ _require_builddir:
 	fi
 
 define clobber-help
-# invoke 'make clean' and: remove subproject builds, git-clean and git-checkout .
+# invoke 'make clean', git-clean and git-checkout .
 #
 # This is intended as a way to clearing out the repository for any old "build-debris",
 # take care that you have stashed/commit any of your local changes as anything unstaged
@@ -422,11 +411,9 @@ endef
 .PHONY: clobber
 clobber: clean
 	@echo "## xNVMe: clobber"
-	@git clean -dfx
+	rm -fr $(BUILD_DIR) || true
 	@git clean -dfX
 	@git checkout .
-	@rm -rf subprojects/libvfn || true
-	@rm -rf subprojects/spdk || true
 	@echo "## xNVMe: clobber [DONE]"
 
 

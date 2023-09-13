@@ -1,0 +1,27 @@
+#
+# Clone, build and install dpdk
+#
+# Assumptions:
+#
+# - These commands are executed with sufficient privileges (sudo/root)
+#
+git clone https://github.com/dpdk/dpdk.git toolbox/third-party/dpdk/repository
+pushd toolbox/third-party/dpdk/repository 
+
+git checkout v22.11
+
+# 'cpu_instruction_set=generic' is used for cross compilation reasons for optimal performance use 'cpu_instruction_set=native'
+meson setup builddir --prefix=/usr \
+-Dc_args="-fPIC -Wno-error  -Wno-stringop-overflow -fcommon -Wno-stringop-overread -Wno-array-bounds" \
+-Dcpu_instruction_set=generic \
+-Ddisable_libs=gro,node,cfgfile,pdump,bitratestats,flow_classify,table,port,latencystats,kni,metrics,pipeline,jobstats,gpudev,gso,regexdev \
+-Ddisable_apps=pdump,test-cmdline,test,test-regex,test-gpudev,test-fib,test-pipeline,test-sad,test-acl,test-bbdev,proc-info,test-eventdev,test-flow-perf,test-pmd,dumpcap,test-compress-perf,test-crypto-perf,test-security-perf \
+-Denable_docs=false \
+-Denable_drivers=bus,bus/pci,bus/vdev,mempool/ring \
+-Denable_kmods=false \
+-Dtests=false
+
+
+meson compile -C builddir
+meson install -C builddir
+popd

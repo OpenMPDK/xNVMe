@@ -39,12 +39,6 @@ out/
 *.exe
 *.lib
 *.vcxproj.*
-subprojects/*
-!subprojects/fio.wrap
-!subprojects/liburing.wrap
-!subprojects/spdk.wrap
-!subprojects/libnvme-vfio.wrap
-!subprojects/packagefiles
 dist
 selftest_results
 *.egg-info

@@ -26,7 +26,7 @@ defaults:
 
 jobs:
   #
-  # Produce a "full" source-archive, that is, xNVMe and source from subprojects
+  # Produce a source-archive
   #
   # This is done for multiple reasons:
   #
@@ -227,11 +227,6 @@ jobs:
       if: always()
       run: |
         cat builddir/meson-logs/meson-log.txt || true
-
-    - name: isal-log-dump
-      if: always()
-      run: |
-        cat subprojects/spdk/isa-l/spdk-isal.log || true
 
     - name: Execute 'xnvme enum'
       run: xnvme enum
@@ -745,7 +740,7 @@ jobs:
       run: scan-build make config-debug
 
     - name: Run scan-build
-      run: scan-build --exclude subprojects -o /tmp/scan-build-report make
+      run: scan-build -o /tmp/scan-build-report make
 
     - name: Upload scan-build report
       uses: actions/upload-artifact@v3.1.1

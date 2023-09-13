@@ -1,0 +1,26 @@
+#
+# Clone, build and install dpdk
+#
+# Assumptions:
+#
+# - These commands are executed with sufficient privileges (sudo/root)
+#
+git clone https://github.com/dpdk/dpdk.git toolbox/third-party/dpdk/repository
+pushd toolbox/third-party/dpdk/repository 
+
+git checkout v22.11
+
+meson setup builddir --prefix=/usr \
+-Dc_args="-fPIC -Wno-error" \
+-Dcpu_instruction_set=native \
+-Ddisable_libs=bitratestats,cfgfile,flow_classify,gpudev,gro,gso,jobstats,kni,latencystats,metrics,node,pdump,pipeline,port,table \
+-Ddisable_apps=pdump,test-cmdline,test,test-regex,test-gpudev,test-fib,test-pipeline,test-sad,test-acl,test-bbdev,proc-info,test-eventdev,test-flow-perf,test-pmd,dumpcap,test-compress-perf,test-crypto-perf,test-security-perf \
+-Denable_docs=false \
+-Denable_drivers=bus,bus/pci,bus/vdev,mempool/ring \
+-Denable_kmods=true \
+-Dtests=false
+
+
+meson compile -C builddir
+meson install -C builddir
+popd

@@ -166,7 +166,7 @@ def fabrics_setup(cijoe):
         return errno.EINVAL
 
     xnvme_path = Path(xnvme_conf["source"]["path"])
-    rpc = xnvme_path / "subprojects" / "spdk" / "scripts" / "rpc.py"
+    rpc = xnvme_path / "spdk" / "scripts" / "rpc.py"
     ip = "127.0.0.1"
     port = "4420"
     trtype = "tcp"
@@ -186,13 +186,9 @@ def fabrics_setup(cijoe):
     # Get pairs of pcie id and subnqn -> might contain dublicates hence we cast to a set
     devices = set(re.findall(r"{uri: '(.*)'.* subnqn: '(.*)'}", state.output()))
 
-    if not os.path.exists(
-        xnvme_path / "subprojects" / "spdk" / "build" / "bin" / "nvmf_tgt"
-    ):
+    if not os.path.exists(xnvme_path / "spdk" / "build" / "bin" / "nvmf_tgt"):
         # Build the SPDK NVMe-oF target-app (nvmf_tgt)
-        err, _ = cijoe.run(
-            "make", cwd=xnvme_path / "subprojects" / "spdk" / "app" / "nvmf_tgt"
-        )
+        err, _ = cijoe.run("make", cwd=xnvme_path / "spdk" / "app" / "nvmf_tgt")
         assert not err
     else:
         # Kill nvmf_tgt if it is already running
@@ -202,7 +198,7 @@ def fabrics_setup(cijoe):
     # Start 'nvmf_tgt'
     err, _ = cijoe.run(
         "(nohup ./nvmf_tgt -m [1] > foo.out 2> foo.err < /dev/null &)",
-        cwd=xnvme_path / "subprojects" / "spdk" / "build" / "bin",
+        cwd=xnvme_path / "spdk" / "build" / "bin",
     )
     assert not err
 

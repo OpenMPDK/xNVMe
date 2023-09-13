@@ -19,13 +19,6 @@ deps:
       pacman: [clang] # Arch/pacman does not provide a "smaller" package
       zypper: [clang-tools]
 
-  find:
-    notes: Required by the xNVMe build-system to apply patches to subprojects
-    ver: 0.0
-    when: [building]
-    names:
-      default: [findutils] # dnf, zypper
-
   git:
     notes: For retrieving the xNVMe source and revision-control when developing
     ver: 2.20
@@ -52,13 +45,6 @@ deps:
       emerge: [dev-util/meson]
       pip: [meson, ninja]
       pipx: [meson, ninja]
-
-  patch:
-    notes: Required by the xNVMe build-system to apply patches to subprojects
-    ver: 0.0
-    when: [building]
-    names:
-      default: [patch] # dnf, yum, zypper
 
   pkg-config:
     notes: Find libraries which xNVMe depends upon and provide a simple means for other projects to find xNVMe
@@ -109,6 +95,14 @@ deps:
       dnf: [CUnit-devel]
       yum: [CUnit-devel]
       zypper: [cunit-devel]
+
+  dpdk:
+    notes: Required to install and enable the use of the xNVMe SPDK backend
+    ver: 22.11
+    when: [building, running]
+    purpose: {be: [spdk]}
+    names:
+      src: [dpdk]
 
   elftools:
     notes: Required by DPDK and thereby for SPDK.
@@ -234,6 +228,14 @@ deps:
       yum: [openssl-devel, openssl11-devel]
       zypper: [libopenssl-devel]
 
+  spdk:
+    notes: When available; enable the use of the xNVMe SPDK backend
+    ver: 23.05
+    when: [building, running]
+    purpose: {be: [spdk]}
+    names:
+      src: [spdk]
+
 apps:
   fio:
     notes: The flexible I/O tester (fio), supports xNVMe when fio is built from source
@@ -252,16 +254,16 @@ apps:
 defaults:
   freebsd:
     deps:
-    - [sys, [bash, clang-format, cunit, elftools, find, git, libuuid, make, meson, nasm, ncurses, openssl, patch, pipx, pkg-config,
-        python3]]
+    - [sys, [bash, clang-format, cunit, elftools, git, libuuid, make, meson, nasm, ncurses, openssl, pipx, pkg-config, python3]]
+    - [src, [dpdk, spdk]]
     apps:
     - [src, [fio]]
 
   linux:
     deps:
-    - [sys, [bash, cunit, clang-format, elftools, find, git, libaio, liburing, libuuid, make, meson, nasm, ncurses, numactl,
-        openssl, patch, pipx, pkg-config, python3]]
-    - [src, [libvfn]]
+    - [sys, [bash, cunit, clang-format, elftools, git, libaio, liburing, libuuid, make, meson, nasm, ncurses, numactl, openssl,
+        pipx, pkg-config, python3]]
+    - [src, [libvfn, dpdk, spdk]]
     apps:
     - [src, [fio]]
 
@@ -321,7 +323,7 @@ platforms:
   drop: []
   alt:
   - [pip, [pipx]]
-  - [src, [liburing, libvfn]]
+  - [src, [liburing, libvfn, dpdk, spdk]]
   aux:
   - [sys, [autoconf, diffutils, gcc, gcc-c++, libtool, procps, unzip, wget, zlib-devel]]
 
@@ -348,7 +350,7 @@ platforms:
   drop: [clang-format]
   alt:
   - [pip, [elftools, meson, pipx]]
-  - [src, [liburing, libvfn]]
+  - [src, [liburing, libvfn, dpdk, spdk]]
   aux:
   - [sys, [autoconf, diffutils, gcc, gcc-c++, libtool, procps, unzip, wget, zlib-devel]]
 
@@ -363,7 +365,6 @@ platforms:
   aux:
   - [sys, [autoconf, build-essential, libtool]]
 
-
 - alias: Debian Stable
   notes: ''
   name: debian
@@ -375,7 +376,6 @@ platforms:
   aux:
   - [sys, [autoconf, build-essential, libtool]]
 
-
 - alias: Debian Oldstable
   notes: ''
   name: debian
@@ -385,7 +385,7 @@ platforms:
   drop: []
   alt:
   - [pip, [meson, pipx]]
-  - [src, [liburing, libvfn]]
+  - [src, [liburing, libvfn, dpdk, spdk]]
   aux:
   - [sys, [autoconf, build-essential, libtool]]
 
@@ -432,7 +432,7 @@ platforms:
   drop: []
   alt:
   - [pip, [meson]]
-  - [src, [liburing, libvfn]]
+  - [src, [liburing, libvfn, dpdk, spdk]]
   aux:
   - [sys, [autoconf, build-essential, libtool]]
 

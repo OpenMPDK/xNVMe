@@ -15,3 +15,9 @@ export EXPORT_DEV_PCIE="0000:03:00.0"
 
 # Absolute path to the xNVMe repository
 export XNVME_REPOS="/root/git/xnvme"
+
+# Absolute path to the SPDK repository
+export SPDK_REPOS="/root/git/spdk"
+
+# Absolute path to the Fio repository
+export FIO_REPOS="/root/git/fio"

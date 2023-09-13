@@ -18,5 +18,5 @@ def main(args, cijoe, step):
 
     xnvme_source = step.get("with", {}).get("xnvme_source", "/tmp/xnvme_source")
 
-    cijoe.run(f"kldconfig -i -m -vv {xnvme_source}/subprojects/spdk/dpdk/build/kmod")
+    cijoe.run(f"kldconfig -i -m -vv {xnvme_source}/dpdk/build/kmod")
     return 0

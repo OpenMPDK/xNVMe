@@ -1,1 +1,0 @@
-option('build_subprojects', type : 'boolean', value : true, yield : true)

@@ -83,7 +83,9 @@ xnvmelib_deps = [
   libvfn_dep,
   uring_dep,
   aio_dep,
-  spdk_dep,
+  spdk_nvme,
+  spdk_env_dpdk,
+  spdk_deps,
   thread_dep,
   rt_dep,
 ]
@@ -107,12 +109,25 @@ xnvmelib_static = static_library(
   install: true,
 )
 
+pkgconfig_deps = [
+  setupapi_dep,
+  corefoundation_dep,
+  iokit_dep,
+  libvfn_dep,
+  uring_dep,
+  aio_dep,
+  spdk_nvme,
+  spdk_env_dpdk,
+  spdk_syslibs,
+  thread_dep,
+  rt_dep,
+]
 
 # pkg-config -- describing how to consume the xNVMe library
 pconf.generate(
   xnvmelib_shared,
   install_dir: is_freebsd ? 'libdata/pkgconfig' : xnvmelib_libdir + '/pkgconfig',
-  libraries_private: xnvmelib_deps,
+  libraries_private: pkgconfig_deps,
   version: meson.project_version(),
   variables: [
     'datadir=' + get_option('prefix') / get_option('datadir') / meson.project_name()

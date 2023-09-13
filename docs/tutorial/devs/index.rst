@@ -369,7 +369,7 @@ Produce a set of **artifacts**::
   cp -r /tmp/artifacts ~/artifacts/xnvme
 
 .. warning::
-   The ``make clobber`` removes any unstaged changes and removes subprojects.
+   The ``make clobber`` removes any unstaged changes.
    This is done to ensure an entirely "clean" repository. Thus, make sure that
    you have commit your changes.
    The ``make clobber`` is required for ``make gen-artifacts``, as it will
