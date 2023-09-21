@@ -21,6 +21,7 @@ test_open_zdptr(struct xnvme_cli *cli)
 	uint64_t zidx = 0;
 
 	struct xnvme_znd_report *before = NULL, *after = NULL;
+	struct xnvme_spec_znd_descr *descr;
 
 	int err;
 
@@ -55,7 +56,11 @@ test_open_zdptr(struct xnvme_cli *cli)
 	xnvme_cli_pinf("Scan for empty and sequential write ctx. zone");
 
 	for (uint64_t idx = 0; idx < before->nentries; ++idx) {
-		struct xnvme_spec_znd_descr *descr = XNVME_ZND_REPORT_DESCR(before, idx);
+		err = xnvme_znd_report_get_descr(before, idx, &descr, NULL);
+		if (err) {
+			XNVME_DEBUG("xnvme_znd_report_get_descr(), err: %d", err);
+			return err;
+		}
 
 		if (cli->given[XNVME_CLI_OPT_SLBA] && (cli->args.lba != descr->zslba)) {
 			continue;
@@ -74,10 +79,15 @@ test_open_zdptr(struct xnvme_cli *cli)
 		goto exit;
 	}
 
-	xnvme_cli_pinf("Using: {zslba: 0x%016lx, zidx: %zu}", zslba, zidx);
+	err = xnvme_znd_report_get_descr(before, zidx, &descr, NULL);
+	if (err) {
+		XNVME_DEBUG("xnvme_znd_report_get_descr(), zidx: %" PRIu64 " err: %d", zidx err);
+		return err;
+	}
 
+	xnvme_cli_pinf("Using: {zslba: 0x%016lx, zidx: %zu}", zslba, zidx);
 	xnvme_cli_pinf("Before");
-	xnvme_spec_znd_descr_pr(XNVME_ZND_REPORT_DESCR(before, zidx), XNVME_PR_DEF);
+	xnvme_spec_znd_descr_pr(descr, XNVME_PR_DEF);
 
 	err = xnvme_znd_mgmt_send(&ctx, nsid, zslba, false, XNVME_SPEC_ZND_CMD_MGMT_SEND_RESET,
 				  0x0, NULL);
@@ -106,12 +116,23 @@ test_open_zdptr(struct xnvme_cli *cli)
 		goto exit;
 	}
 
-	xnvme_spec_znd_descr_pr(XNVME_ZND_REPORT_DESCR(before, zidx), XNVME_PR_DEF);
+	err = xnvme_znd_report_get_descr(before, zidx, &descr, NULL);
+	if (err) {
+		XNVME_DEBUG("xnvme_znd_report_get_descr(), zidx: %" PRIu64 " err: %d", zidx err);
+		return err;
+	}
+	xnvme_spec_znd_descr_pr(descr, XNVME_PR_DEF);
 
 	{
+		void *zde_after;
+
 		// Verification
-		struct xnvme_spec_znd_descr *descr = XNVME_ZND_REPORT_DESCR(after, zidx);
-		uint8_t *zde_after = XNVME_ZND_REPORT_DEXT(after, zidx);
+		err = xnvme_znd_report_get_descr(after, zidx, &descr, &zde_after);
+		if (err) {
+			XNVME_DEBUG("xnvme_znd_report_get_descr(), zidx: %" PRIu64 " err: %d",
+				    zidx, err);
+			return err;
+		}
 
 		if (xnvme_buf_diff(zde, zde_after, zde_nbytes)) {
 			xnvme_buf_diff_pr(zde, descr, zde_nbytes, XNVME_PR_DEF);
