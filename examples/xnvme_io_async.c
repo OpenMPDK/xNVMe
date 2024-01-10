@@ -44,7 +44,7 @@ cb_pool(struct xnvme_cmd_ctx *ctx, void *cb_arg)
 static int
 sub_async_read(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	struct xnvme_lba_range rng = {0};
 	uint32_t nsid, qd;
@@ -172,7 +172,7 @@ exit:
 static int
 sub_async_write(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	struct xnvme_lba_range rng = {0};
 	uint32_t nsid, qd;
@@ -184,7 +184,8 @@ sub_async_write(struct xnvme_cli *cli)
 	int err;
 
 	qd = cli->given[XNVME_CLI_OPT_QDEPTH] ? cli->args.qdepth : DEFAULT_QD;
-	nsid = cli->given[XNVME_CLI_OPT_NSID] ? cli->args.nsid : xnvme_dev_get_nsid(cli->args.dev);
+	nsid = cli->given[XNVME_CLI_OPT_NSID] ? cli->args.nsid
+					      : xnvme_dev_get_nsid(cli->args.device);
 
 	rng = xnvme_lba_range_from_slba_elba(dev, cli->args.slba, cli->args.elba);
 	if (!rng.attr.is_valid) {

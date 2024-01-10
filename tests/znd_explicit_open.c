@@ -8,7 +8,7 @@
 static int
 test_open_zdptr(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	struct xnvme_spec_idfy_ns *nvm = (void *)xnvme_dev_get_ns(dev);
 	struct xnvme_spec_znd_idfy_ns *zns = (void *)xnvme_dev_get_ns_css(dev);

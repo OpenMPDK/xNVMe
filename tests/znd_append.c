@@ -35,7 +35,7 @@ cb_lbacheck(struct xnvme_cmd_ctx *ctx, void *cb_arg)
 static int
 cmd_verify(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid = cli->args.nsid;
 	struct xnvme_spec_znd_descr zone = {0};
@@ -48,7 +48,7 @@ cmd_verify(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 	if (cli->args.clear) {
 		err = -EINVAL;

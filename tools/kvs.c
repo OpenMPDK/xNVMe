@@ -60,15 +60,15 @@ cmd_enumerate(struct xnvme_cli *cli)
 static inline int
 cmd_idfy_ns(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
-	uint32_t nsid = xnvme_dev_get_nsid(cli->args.dev);
+	uint32_t nsid = xnvme_dev_get_nsid(cli->args.device);
 	enum xnvme_spec_csi csi = XNVME_SPEC_CSI_KV;
 	struct xnvme_spec_kvs_idfy *idfy = NULL;
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 
 	xnvme_cli_pinf("xnvme_adm_idfy_ns: {nsid: 0x%x, csi: %s}", nsid, xnvme_spec_csi_str(csi));
@@ -107,7 +107,7 @@ exit:
 static int
 cmd_retrieve(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint8_t nsid = cli->args.nsid;
 	void *dbuf = NULL;
@@ -115,7 +115,7 @@ cmd_retrieve(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 
 	xnvme_cli_pinf("Alloc/clear dbuf, dbuf_nbytes: %zu", dbuf_nbytes);
@@ -157,7 +157,7 @@ exit:
 static int
 cmd_store(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint8_t nsid = cli->args.nsid;
 	uint8_t opt = 0x0;
@@ -166,7 +166,7 @@ cmd_store(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 	xnvme_cli_pinf("Alloc/fill dbuf, dbuf_nbytes: %zu", dbuf_nbytes);
 
@@ -204,13 +204,13 @@ exit:
 static int
 cmd_delete(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint8_t nsid = cli->args.nsid;
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 
 	xnvme_cli_pinf("Sending xnvme_kvs_delete command");
@@ -232,13 +232,13 @@ exit:
 static int
 cmd_exist(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint8_t nsid = cli->args.nsid;
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 
 	xnvme_cli_pinf("Sending xnvme_kvs_exist command");
@@ -259,7 +259,7 @@ exit:
 static int
 cmd_list(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint8_t nsid = cli->args.nsid;
 	void *dbuf = NULL;
@@ -267,7 +267,7 @@ cmd_list(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 
 	XNVME_DEBUG("Alloc/clear dbuf, dbuf_nbytes: %zu", dbuf_nbytes);

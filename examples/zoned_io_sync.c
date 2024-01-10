@@ -8,7 +8,7 @@
 static int
 sub_sync_read(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid = cli->args.nsid;
 
@@ -19,7 +19,7 @@ sub_sync_read(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 	if (cli->given[XNVME_CLI_OPT_SLBA]) {
 		err = xnvme_znd_descr_from_dev(dev, cli->args.slba, &zone);
@@ -88,7 +88,7 @@ exit:
 static int
 sub_sync_write(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid = cli->args.nsid;
 
@@ -99,7 +99,7 @@ sub_sync_write(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 	if (cli->given[XNVME_CLI_OPT_SLBA]) {
 		err = xnvme_znd_descr_from_dev(dev, cli->args.slba, &zone);
@@ -161,7 +161,7 @@ exit:
 static int
 sub_sync_append(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid = cli->args.nsid;
 
@@ -172,7 +172,7 @@ sub_sync_append(struct xnvme_cli *cli)
 	int err;
 
 	if (!cli->given[XNVME_CLI_OPT_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 	if (cli->given[XNVME_CLI_OPT_SLBA]) {
 		err = xnvme_znd_descr_from_dev(dev, cli->args.slba, &zone);

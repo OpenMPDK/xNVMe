@@ -8,7 +8,7 @@
 static int
 kvs_io(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint8_t nsid = cli->args.dev_nsid;
 	const void *kv_key;
@@ -35,7 +35,7 @@ kvs_io(struct xnvme_cli *cli)
 	kv_val_nbytes = strlen(kv_val) + 1;
 
 	if (!cli->given[XNVME_CLI_OPT_DEV_NSID]) {
-		nsid = xnvme_dev_get_nsid(cli->args.dev);
+		nsid = xnvme_dev_get_nsid(cli->args.device);
 	}
 
 	xnvme_cli_pinf("Alloc/fill dbuf, kv_val_nbytes: %zu", kv_val_nbytes);

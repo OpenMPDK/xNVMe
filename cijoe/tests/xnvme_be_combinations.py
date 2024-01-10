@@ -14,6 +14,7 @@ def get_combinations():
             "admin": ["ramdisk"],
             "async": ["emu", "thrpool"],
             "mem": ["posix", "hugepage"],
+            "dev": ["nvme"],
             "sync": ["ramdisk"],
             "label": ["bdev", "ramdisk"],
         },
@@ -23,6 +24,7 @@ def get_combinations():
             "admin": ["file_as_ns"],
             "async": ["emu", "thrpool"],
             "mem": ["posix", "hugepage"],
+            "dev": ["nvme"],
             "sync": ["psync"],
             "label": ["file"],
         },
@@ -32,6 +34,7 @@ def get_combinations():
             "admin": ["nvme", "block"],
             "async": ["emu", "thrpool"],
             "mem": ["posix", "hugepage"],
+            "dev": ["nvme"],
             "sync": ["nvme", "psync", "block"],
             "label": ["bdev"],
         },
@@ -41,6 +44,7 @@ def get_combinations():
             "admin": ["nvme", "block"],
             "async": ["posix", "libaio", "io_uring"],
             "mem": ["posix", "hugepage"],
+            "dev": ["nvme"],
             "sync": ["nvme"],
             "label": ["bdev"],
         },
@@ -50,6 +54,7 @@ def get_combinations():
             "admin": ["nvme"],
             "async": ["emu", "thrpool"],
             "mem": ["posix", "hugepage"],
+            "dev": ["nvme"],
             "sync": ["nvme"],
             "label": ["cdev"],
         },
@@ -57,6 +62,7 @@ def get_combinations():
         {
             "be": ["linux"],
             "mem": ["posix", "hugepage"],
+            "dev": ["nvme"],
             "sync": ["nvme"],
             "async": ["io_uring_cmd"],
             "admin": ["nvme"],
@@ -66,6 +72,7 @@ def get_combinations():
         {
             "be": ["vfio"],
             "mem": ["vfio"],
+            "dev": ["nvme"],
             "async": ["vfio"],
             "sync": ["vfio"],
             "admin": ["vfio"],
@@ -74,6 +81,7 @@ def get_combinations():
         {
             "be": ["spdk"],
             "mem": ["spdk"],
+            "dev": ["nvme"],
             "async": ["nvme"],
             "sync": ["nvme"],
             "admin": ["nvme"],
@@ -82,6 +90,7 @@ def get_combinations():
         {
             "be": ["spdk"],
             "mem": ["spdk"],
+            "dev": ["nvme"],
             "async": ["nvme"],
             "sync": ["nvme"],
             "admin": ["nvme"],
@@ -93,6 +102,7 @@ def get_combinations():
         {
             "be": ["spdk"],
             "mem": ["spdk"],
+            "dev": ["nvme"],
             "async": ["nvme"],
             "sync": ["nvme"],
             "admin": ["nvme"],
@@ -103,6 +113,7 @@ def get_combinations():
         {
             "be": ["fbsd"],
             "mem": ["posix"],
+            "dev": ["nvme"],
             "async": ["emu", "posix", "thrpool", "kqueue"],
             "sync": ["psync", "nvme"],
             "admin": ["nvme"],

@@ -15,6 +15,7 @@ sub_optional(struct xnvme_cli *cli)
 	xnvme_cli_pinf("sync: '%s', given: %d", cli->args.sync, cli->given[XNVME_CLI_OPT_SYNC]);
 	xnvme_cli_pinf("async: '%s', given: %d", cli->args.async, cli->given[XNVME_CLI_OPT_ASYNC]);
 	xnvme_cli_pinf("admin: '%s', given: %d", cli->args.admin, cli->given[XNVME_CLI_OPT_ADMIN]);
+	xnvme_cli_pinf("dev: '%s', given: %d", cli->args.dev, cli->given[XNVME_CLI_OPT_DEV]);
 
 	return err;
 }

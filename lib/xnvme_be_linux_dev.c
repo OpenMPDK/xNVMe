@@ -327,6 +327,7 @@ xnvme_be_linux_enumerate(const char *sys_uri, struct xnvme_opts *opts, xnvme_enu
 #endif
 
 struct xnvme_be_dev g_xnvme_be_dev_linux = {
+	.id = "nvme",
 #ifdef XNVME_BE_LINUX_ENABLED
 	.enumerate = xnvme_be_linux_enumerate,
 	.dev_open = xnvme_be_linux_dev_open,

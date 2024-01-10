@@ -20,13 +20,13 @@ test_buf_alloc_free(struct xnvme_cli *cli)
 		printf("\n");
 		xnvme_cli_pinf("[alloc/free] i: %zu, buf_nbytes: %zu", i + 1, buf_nbytes);
 
-		buf = xnvme_buf_alloc(cli->args.dev, buf_nbytes);
+		buf = xnvme_buf_alloc(cli->args.device, buf_nbytes);
 		if (!buf) {
 			xnvme_cli_perr("xnvme_buf_alloc()", -errno);
 			nerr += 1;
 			continue;
 		}
-		xnvme_buf_free(cli->args.dev, buf);
+		xnvme_buf_free(cli->args.device, buf);
 
 		xnvme_cli_pinf("buf: %p", buf);
 	}

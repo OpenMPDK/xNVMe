@@ -25,12 +25,13 @@ size_t nactions = sizeof actions / sizeof *actions;
 static int
 cmd_transition(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	uint32_t nsid;
 	uint64_t slba;
 	int err = 0;
 
-	nsid = cli->given[XNVME_CLI_OPT_NSID] ? cli->args.nsid : xnvme_dev_get_nsid(cli->args.dev);
+	nsid = cli->given[XNVME_CLI_OPT_NSID] ? cli->args.nsid
+					      : xnvme_dev_get_nsid(cli->args.device);
 	slba = cli->given[XNVME_CLI_OPT_SLBA] ? cli->args.slba : 0x0;
 
 	for (size_t i = 0; i < nactions; ++i) {
@@ -70,7 +71,7 @@ exit:
 static int
 cmd_changes(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_spec_idfy_ctrlr *idfy_ctrlr = xnvme_dev_get_ctrlr_css(dev);
 	struct xnvme_spec_znd_log_changes *changes;
 	int err = 0;

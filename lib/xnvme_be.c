@@ -705,8 +705,7 @@ xnvme_be_factory(struct xnvme_dev *dev, struct xnvme_opts *opts)
 			dev->opts.sync = dev->be.sync.id;
 			dev->opts.async = dev->be.async.id;
 			dev->opts.mem = dev->be.mem.id;
-
-			dev->opts.dev = "FIX-ID-VS-MIXIN-NAME";
+			dev->opts.dev = dev->be.dev.id;
 			return 0;
 
 		case EPERM:

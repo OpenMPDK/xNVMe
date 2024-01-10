@@ -608,6 +608,12 @@ static struct xnvme_cli_opt_attr xnvme_cli_opts[] = {
 		.descr = "xNVMe admin. command-interface, e.g. 'nvme', 'block'",
 	},
 	{
+		.opt = XNVME_CLI_OPT_DEV,
+		.vtype = XNVME_CLI_OPT_VTYPE_STR,
+		.name = "dev",
+		.descr = "xNVMe dev interface, e.g. 'nvme'",
+	},
+	{
 		.opt = XNVME_CLI_OPT_SHM_ID,
 		.vtype = XNVME_CLI_OPT_VTYPE_HEX,
 		.name = "shm_id",
@@ -1347,6 +1353,9 @@ xnvme_cli_assign_arg(struct xnvme_cli *cli, struct xnvme_cli_opt_attr *opt_attr,
 	case XNVME_CLI_OPT_ADMIN:
 		args->admin = arg ? arg : "INVALID_INPUT";
 		break;
+	case XNVME_CLI_OPT_DEV:
+		args->dev = arg ? arg : "INVALID_INPUT";
+		break;
 
 	case XNVME_CLI_OPT_SHM_ID:
 		args->shm_id = num;
@@ -1819,13 +1828,13 @@ xnvme_cli_run(struct xnvme_cli *cli, int argc, char **argv, int opts)
 			return -1;
 		}
 
-		cli->args.dev = xnvme_dev_open(cli->args.uri, &opts);
-		if (!cli->args.dev) {
+		cli->args.device = xnvme_dev_open(cli->args.uri, &opts);
+		if (!cli->args.device) {
 			err = -errno;
 			xnvme_cli_perr("xnvme_dev_open()", err);
 			return -1;
 		}
-		cli->args.geo = xnvme_dev_get_geo(cli->args.dev);
+		cli->args.geo = xnvme_dev_get_geo(cli->args.device);
 	}
 
 	err = cli->sub->command(cli);
@@ -1837,8 +1846,8 @@ xnvme_cli_run(struct xnvme_cli *cli, int argc, char **argv, int opts)
 		xnvme_cli_args_pr(&cli->args, 0x0);
 	}
 
-	if ((opts & XNVME_CLI_INIT_DEV_OPEN) && cli->args.dev) {
-		xnvme_dev_close(cli->args.dev);
+	if ((opts & XNVME_CLI_INIT_DEV_OPEN) && cli->args.device) {
+		xnvme_dev_close(cli->args.device);
 	}
 
 	return err ? 1 : 0;
@@ -1852,6 +1861,7 @@ xnvme_cli_to_opts(const struct xnvme_cli *cli, struct xnvme_opts *opts)
 	opts->sync = cli->given[XNVME_CLI_OPT_SYNC] ? cli->args.sync : opts->sync;
 	opts->async = cli->given[XNVME_CLI_OPT_ASYNC] ? cli->args.async : opts->async;
 	opts->admin = cli->given[XNVME_CLI_OPT_ADMIN] ? cli->args.admin : opts->admin;
+	opts->dev = cli->given[XNVME_CLI_OPT_DEV] ? cli->args.dev : opts->dev;
 
 	opts->nsid = cli->given[XNVME_CLI_OPT_DEV_NSID] ? cli->args.dev_nsid : opts->nsid;
 

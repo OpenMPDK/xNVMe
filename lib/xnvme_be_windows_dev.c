@@ -372,6 +372,7 @@ xnvme_be_windows_enumerate(const char *sys_uri, struct xnvme_opts *opts,
 #endif
 
 struct xnvme_be_dev g_xnvme_be_dev_windows = {
+	.id = "nvme",
 #ifdef XNVME_BE_WINDOWS_ENABLED
 	.enumerate = xnvme_be_windows_enumerate,
 	.dev_open = xnvme_be_windows_dev_open,

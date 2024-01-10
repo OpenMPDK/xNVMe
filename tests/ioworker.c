@@ -282,7 +282,7 @@ iowork_from_cli(struct xnvme_cli *cli, struct iowork *work)
 
 	xnvme_buf_fill(work, sizeof(*work), "zero");
 
-	work->dev = cli->args.dev;
+	work->dev = cli->args.device;
 	work->nsid = xnvme_dev_get_nsid(work->dev);
 	work->geo = xnvme_dev_get_geo(work->dev);
 	work->qdepth = cli->given[XNVME_CLI_OPT_QDEPTH] ? cli->args.qdepth : QDEPTH_DEF;
@@ -307,7 +307,7 @@ iowork_from_cli(struct xnvme_cli *cli, struct iowork *work)
 	work->nio = work->range.naddr / work->io.naddr;
 	work->nworkers = work->nio > work->qdepth ? work->qdepth : work->nio;
 
-	work->wbuf = xnvme_buf_alloc(cli->args.dev, work->range.nbytes);
+	work->wbuf = xnvme_buf_alloc(cli->args.device, work->range.nbytes);
 	if (!work->wbuf) {
 		err = -errno;
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc(data), err: %d", errno);
@@ -315,7 +315,7 @@ iowork_from_cli(struct xnvme_cli *cli, struct iowork *work)
 	}
 	xnvme_buf_fill(work->wbuf, work->range.nbytes, "rand-t");
 
-	work->rbuf = xnvme_buf_alloc(cli->args.dev, work->range.nbytes);
+	work->rbuf = xnvme_buf_alloc(cli->args.device, work->range.nbytes);
 	if (!work->rbuf) {
 		err = -errno;
 		XNVME_DEBUG("FAILED: xnvme_buf_alloc(buf), err: %d", errno);

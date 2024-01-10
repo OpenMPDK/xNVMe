@@ -20,7 +20,7 @@
 static int
 sub_support(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_spec_nvm_idfy_ctrlr *ctrlr;
 	struct xnvme_spec_nvm_idfy_ns *ns;
 	int err = 0;
@@ -66,7 +66,7 @@ sub_support(struct xnvme_cli *cli)
 static int
 sub_idfy(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_spec_nvm_idfy_ctrlr *ctrlr;
 	struct xnvme_spec_nvm_idfy_ns *ns;
 	int err;
@@ -113,7 +113,7 @@ cb_noop(struct xnvme_cmd_ctx *XNVME_UNUSED(ctx), void *XNVME_UNUSED(cb_arg))
 static int
 _scopy_helper(struct xnvme_cli *cli, uint64_t tlbas)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = xnvme_dev_get_geo(dev);
 	uint32_t nsid = cli->args.nsid;
 	struct xnvme_spec_nvm_idfy_ns *ns;
@@ -125,7 +125,7 @@ _scopy_helper(struct xnvme_cli *cli, uint64_t tlbas)
 	uint8_t nr;
 	int err;
 
-	nsid = cli->given[XNVME_CLI_OPT_NSID] ? nsid : xnvme_dev_get_nsid(cli->args.dev);
+	nsid = cli->given[XNVME_CLI_OPT_NSID] ? nsid : xnvme_dev_get_nsid(cli->args.device);
 
 	// Retrieve SCC parameters via idfy-namespace
 	ns = (void *)xnvme_dev_get_ns(dev);
@@ -314,7 +314,7 @@ sub_scopy_msrc(struct xnvme_cli *cli)
 {
 	struct xnvme_spec_nvm_idfy_ns *ns;
 
-	ns = (void *)xnvme_dev_get_ns(cli->args.dev);
+	ns = (void *)xnvme_dev_get_ns(cli->args.device);
 	if (!ns) {
 		xnvme_cli_perr("xnvme_dev_get_ns()", errno);
 		return -errno;

@@ -922,6 +922,7 @@ xnvme_be_spdk_dev_open(struct xnvme_dev *dev)
 #endif
 
 struct xnvme_be_dev g_xnvme_be_spdk_dev = {
+	.id = "nvme",
 #ifdef XNVME_BE_SPDK_ENABLED
 	.enumerate = xnvme_be_spdk_enumerate,
 	.dev_open = xnvme_be_spdk_dev_open,

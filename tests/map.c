@@ -36,14 +36,14 @@ test_mem_map_unmap(struct xnvme_cli *cli)
 			continue;
 		}
 
-		err = xnvme_mem_map(cli->args.dev, buf, buf_nbytes);
+		err = xnvme_mem_map(cli->args.device, buf, buf_nbytes);
 		if (err) {
 			xnvme_cli_perr("xnvme_mem_map()", -errno);
 			nerr += 1;
 			continue;
 		}
 
-		err = xnvme_mem_unmap(cli->args.dev, buf);
+		err = xnvme_mem_unmap(cli->args.device, buf);
 		if (err) {
 			xnvme_cli_perr("xnvme_mem_unmap()", -errno);
 			nerr += 1;

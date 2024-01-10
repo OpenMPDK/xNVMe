@@ -250,6 +250,7 @@ xnvme_be_vfio_dev_close(struct xnvme_dev *dev)
 #endif
 
 struct xnvme_be_dev g_xnvme_be_vfio_dev = {
+	.id = "nvme",
 #ifdef XNVME_BE_LINUX_VFIO_ENABLED
 	.enumerate = xnvme_be_vfio_enumerate,
 	.dev_open = xnvme_be_vfio_dev_open,

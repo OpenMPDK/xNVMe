@@ -11,7 +11,7 @@
 static int
 test_init_term(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	uint64_t count = cli->args.count;
 	uint64_t qd = cli->args.qdepth;
 	int err = 0;

@@ -17,12 +17,12 @@ static int
 boilerplate(struct xnvme_cli *cli, uint8_t **wbuf, uint8_t **rbuf, size_t *buf_nbytes,
 	    uint64_t *mdts_naddr, uint32_t *nsid, uint64_t *rng_slba, uint64_t *rng_elba)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint64_t rng_naddr;
 	int err;
 
-	*nsid = xnvme_dev_get_nsid(cli->args.dev);
+	*nsid = xnvme_dev_get_nsid(cli->args.device);
 
 	*rng_slba = cli->args.slba;
 	*rng_elba = cli->args.elba;
@@ -151,7 +151,7 @@ exit:
 static int
 sub_io(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid;
 	uint64_t rng_slba, rng_elba, mdts_naddr;
@@ -245,7 +245,7 @@ exit:
 static int
 test_scopy(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid;
 	uint64_t rng_slba, rng_elba, xfer_naddr;
@@ -373,7 +373,7 @@ exit:
 static int
 test_write_zeroes(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid;
 	uint64_t rng_slba, rng_elba, mdts_naddr, nlb;
@@ -450,7 +450,7 @@ exit:
 static int
 test_write_uncorrectable(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	uint32_t nsid;
 	uint64_t rng_slba, rng_elba, mdts_naddr, nlb;

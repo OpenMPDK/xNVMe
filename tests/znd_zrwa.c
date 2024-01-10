@@ -8,7 +8,7 @@
 static int
 test_support(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_spec_znd_idfy_ctrlr *ctrlr;
 	struct xnvme_spec_znd_idfy_ns *ns;
 	int err = 0;
@@ -41,7 +41,7 @@ test_support(struct xnvme_cli *cli)
 static int
 test_idfy(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_spec_znd_idfy_ctrlr *ctrlr;
 	struct xnvme_spec_znd_idfy_ns *ns;
 	int err = 0;
@@ -75,7 +75,7 @@ test_idfy(struct xnvme_cli *cli)
 static int
 _eopen_with_zrwa(struct xnvme_cli *cli, bool zrwaa)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
 	uint32_t nsid = xnvme_dev_get_nsid(dev);
 	struct xnvme_spec_znd_descr zone = {0}, after = {0};
@@ -145,10 +145,10 @@ test_eopen_without_zrwa(struct xnvme_cli *cli)
 static int
 test_flush(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	struct xnvme_spec_znd_idfy_ns *zns = (void *)xnvme_dev_get_ns_css(dev);
-	uint32_t nsid = xnvme_dev_get_nsid(cli->args.dev);
+	uint32_t nsid = xnvme_dev_get_nsid(cli->args.device);
 	struct xnvme_spec_znd_descr zone = {0};
 
 	// For the write-payload
@@ -248,10 +248,10 @@ exit:
 static int
 test_flush_implicit(struct xnvme_cli *cli)
 {
-	struct xnvme_dev *dev = cli->args.dev;
+	struct xnvme_dev *dev = cli->args.device;
 	const struct xnvme_geo *geo = cli->args.geo;
 	struct xnvme_spec_znd_idfy_ns *zns = (void *)xnvme_dev_get_ns_css(dev);
-	uint32_t nsid = xnvme_dev_get_nsid(cli->args.dev);
+	uint32_t nsid = xnvme_dev_get_nsid(cli->args.device);
 	struct xnvme_spec_znd_descr zone = {0};
 
 	// For the write-payload
