@@ -1,4 +1,4 @@
-.. _sec-python:
+.. _sec-api-python:
 
 ========
  Python

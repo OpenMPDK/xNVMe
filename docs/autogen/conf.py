@@ -5,7 +5,7 @@ import os
 
 from xnvme_ver import xnvme_ver
 
-#on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+# on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 extensions = [
     "sphinx.ext.todo",
@@ -36,17 +36,20 @@ breathe_projects = {project: os.path.join("builddir", "doxy", "xml")}
 breathe_default_project = project
 breathe_domain_by_extension = {"h": "c"}
 
-html_theme_options = {
-    "analytics_id": "UA-159785887-1"
-}
+html_logo = "../_static/xnvme.svg"
 
-html_theme = 'pydata_sphinx_theme'
+html_theme_options = {"analytics_id": "UA-159785887-1"}
+
+html_theme = "pydata_sphinx_theme"
+
 html_theme_options = {
     "navigation_depth": 4,
-    "show_prev_next": False,
-    "logo": {
-        "text": "xNVMe",
+    "navbar_align": "left",
+    "header_links_before_dropdown": 7,
+    "secondary_sidebar_items": {
+        "material/index": [],
     },
+    "show_prev_next": False,
     "icon_links": [
         {
             "name": "GitHub",
@@ -60,7 +63,14 @@ html_theme_options = {
             "icon": "fa-brands fa-discord",
         },
     ],
-
 }
 
+html_sidebars = {
+    "material/index": [],
+}
 
+html_context = {
+    "default_mode": "light",
+}
+
+html_show_sourcelink = False

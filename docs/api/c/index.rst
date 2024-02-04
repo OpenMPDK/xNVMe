@@ -1,4 +1,4 @@
-.. _sec-c-api:
+.. _sec-api-c:
 
 ########
  C API

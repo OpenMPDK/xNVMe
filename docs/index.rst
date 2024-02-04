@@ -2,6 +2,15 @@
  Cross-platform libraries and tools for NVMe devices
 =====================================================
 
+.. _devenv:
+.. figure:: ../_static/usage.gif
+   :align: right
+   :figwidth: 60%
+
+   A single unified API across platforms, systems, and APIs. Reduce your
+   code-complexity from  ``n * m`` (where ``n`` is the number of platforms and
+   ``m`` are the number of I/O interfaces on the platform.) to ``1``.
+
 **xNVMe** provides the means to program and interact with NVMe devices from
 user space.
 
@@ -46,14 +55,12 @@ Contents:
    :includehidden:
 
    getting_started/index.rst
+   api/index.rst
+   backends/index.rst
    tools/index.rst
-   capis/index.rst
-   examples/index.rst
+   material/index.rst
    tutorial/index.rst
-   python/index.rst
    contributing/index.rst
-   compatibility/index.rst
-   ci/index.rst
 
 Indices and tables
 ==================

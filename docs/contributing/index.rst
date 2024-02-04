@@ -20,6 +20,7 @@ feedback on your `pull-request`_ or ask questions.
    contributing-toolbox.rst
    contributing-conventions.rst
    contributing-branches.rst
+   ci/index.rst
    packaging/index.rst
    release-checklist.rst
    assumptions.rst
