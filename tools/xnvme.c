@@ -159,7 +159,7 @@ _sub_idfy(struct xnvme_cli *cli, uint8_t cns, uint16_t cntid, uint8_t nsid, uint
 		break;
 
 	case XNVME_SPEC_IDFY_CTRLR:
-		xnvme_spec_idfy_ctrl_pr(&dbuf->ctrlr, XNVME_PR_DEF);
+		xnvme_spec_idfy_ctrlr_pr(&dbuf->ctrlr, XNVME_PR_DEF);
 		break;
 
 	case XNVME_SPEC_IDFY_IOCS:

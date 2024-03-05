@@ -224,8 +224,8 @@ class TestLBLK:
         # NVMe-struct copy format
         copy_fmt = xnvme.XNVME_NVM_SCOPY_FMT_ZERO
 
-        xnvme.xnvme_spec_nvm_idfy_ctrlr_pr(
-            xnvme.xnvme_spec_nvm_idfy_ctrlr(
+        xnvme.xnvme_spec_idfy_ctrlr_pr(
+            xnvme.xnvme_spec_idfy_ctrlr(
                 __void_p=xnvme.xnvme_void_p(xnvme.xnvme_dev_get_ctrlr(dev).void_pointer)
             ),
             xnvme.XNVME_PR_DEF,

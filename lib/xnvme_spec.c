@@ -424,7 +424,7 @@ xnvme_spec_ruhs_pr(const struct xnvme_spec_ruhs *ruhs, int limit, int opts)
 }
 
 int
-xnvme_spec_idfy_ctrl_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy, int opts)
+xnvme_spec_idfy_ctrlr_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy, int opts)
 {
 	int wrtn = 0;
 
@@ -537,7 +537,17 @@ xnvme_spec_idfy_ctrl_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy,
 	wrtn += fprintf(stream, "  cqes: %#" PRIx8 "\n", idfy->cqes.val);
 	wrtn += fprintf(stream, "  maxcmd: %" PRIu16 "\n", idfy->maxcmd);
 	wrtn += fprintf(stream, "  nn: %" PRIu32 "\n", idfy->nn);
-	wrtn += fprintf(stream, "  oncs: %#" PRIx16 "\n", idfy->oncs.val);
+	wrtn += fprintf(stream, "  oncs:\n");
+	wrtn += fprintf(stream, "    compare: %" PRIu16 "\n", idfy->oncs.compare);
+	wrtn += fprintf(stream, "    write_unc: %" PRIu16 "\n", idfy->oncs.write_unc);
+	wrtn += fprintf(stream, "    dsm: %" PRIu16 "\n", idfy->oncs.dsm);
+	wrtn += fprintf(stream, "    write_zeroes: %" PRIu16 "\n", idfy->oncs.write_zeroes);
+	wrtn += fprintf(stream, "    set_features_save: %" PRIu16 "\n",
+			idfy->oncs.set_features_save);
+	wrtn += fprintf(stream, "    reservations: %" PRIu16 "\n", idfy->oncs.reservations);
+	wrtn += fprintf(stream, "    timestamp: %" PRIu16 "\n", idfy->oncs.timestamp);
+	wrtn += fprintf(stream, "    verify: %" PRIu16 "\n", idfy->oncs.verify);
+	wrtn += fprintf(stream, "    copy: %" PRIu16 "\n", idfy->oncs.copy);
 	wrtn += fprintf(stream, "  fuses: %#" PRIx16 "\n", idfy->fuses);
 	wrtn += fprintf(stream, "  fna: %#" PRIx8 "\n", idfy->fna.val);
 	wrtn += fprintf(stream, "  vwc: %#" PRIx8 "\n", idfy->vwc.val);
@@ -546,6 +556,9 @@ xnvme_spec_idfy_ctrl_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy,
 	wrtn += fprintf(stream, "  nvscc: %" PRIu8 "\n", idfy->nvscc);
 	wrtn += fprintf(stream, "  acwu: %d" PRIu16 "\n", idfy->acwu);
 	wrtn += fprintf(stream, "  cdfs: %#" PRIx16 "\n", idfy->cdfs.val);
+	wrtn += fprintf(stream, "  cdfs:\n");
+	wrtn += fprintf(stream, "    format0: %" PRIu16 "\n", idfy->cdfs.format0);
+	wrtn += fprintf(stream, "    format1: %" PRIu16 "\n", idfy->cdfs.format1);
 	wrtn += fprintf(stream, "  sgls: %#" PRIx32 "\n", idfy->sgls.val);
 	wrtn += fprintf(stream, "  mnan: %" PRIu32 "\n", idfy->mnan);
 	// TODO: present these better
@@ -559,9 +572,9 @@ xnvme_spec_idfy_ctrl_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy,
 }
 
 int
-xnvme_spec_idfy_ctrl_pr(const struct xnvme_spec_idfy_ctrlr *idfy, int opts)
+xnvme_spec_idfy_ctrlr_pr(const struct xnvme_spec_idfy_ctrlr *idfy, int opts)
 {
-	return xnvme_spec_idfy_ctrl_fpr(stdout, idfy, opts);
+	return xnvme_spec_idfy_ctrlr_fpr(stdout, idfy, opts);
 }
 
 int
@@ -996,7 +1009,7 @@ xnvme_spec_nvm_scopy_source_range_pr(const struct xnvme_spec_nvm_scopy_source_ra
 
 // TODO: add yaml file and call it
 int
-xnvme_spec_idfy_ctrlr_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ctrlr *idfy, int opts)
+xnvme_spec_nvm_idfy_ctrlr_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ctrlr *idfy, int opts)
 {
 	int wrtn = 0;
 
@@ -1017,20 +1030,12 @@ xnvme_spec_idfy_ctrlr_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ctrlr *idfy, 
 	}
 
 	wrtn += fprintf(stream, "\n");
-	wrtn += fprintf(stream, "  oncs:\n");
-	wrtn += fprintf(stream, "    compare: %" PRIu16 "\n", idfy->oncs.compare);
-	wrtn += fprintf(stream, "    write_unc: %" PRIu16 "\n", idfy->oncs.write_unc);
-	wrtn += fprintf(stream, "    dsm: %" PRIu16 "\n", idfy->oncs.dsm);
-	wrtn += fprintf(stream, "    write_zeroes: %" PRIu16 "\n", idfy->oncs.write_zeroes);
-	wrtn += fprintf(stream, "    set_features_save: %" PRIu16 "\n",
-			idfy->oncs.set_features_save);
-	wrtn += fprintf(stream, "    reservations: %" PRIu16 "\n", idfy->oncs.reservations);
-	wrtn += fprintf(stream, "    timestamp: %" PRIu16 "\n", idfy->oncs.timestamp);
-	wrtn += fprintf(stream, "    verify: %" PRIu16 "\n", idfy->oncs.verify);
-	wrtn += fprintf(stream, "    copy: %" PRIu16 "\n", idfy->oncs.copy);
-
-	wrtn += fprintf(stream, "  ocfs:\n");
-	wrtn += fprintf(stream, "    copy_fmt0: %" PRIu16 "\n", idfy->ocfs.copy_fmt0);
+	wrtn += fprintf(stream, "  vsl: %" PRIu8 "\n", idfy->vsl);
+	wrtn += fprintf(stream, "  wzsl: %" PRIu8 "\n", idfy->wzsl);
+	wrtn += fprintf(stream, "  wusl: %" PRIu8 "\n", idfy->wusl);
+	wrtn += fprintf(stream, "  dmrl: %" PRIu8 "\n", idfy->dmrl);
+	wrtn += fprintf(stream, "  dmrsl: %" PRIu32 "\n", idfy->dmrsl);
+	wrtn += fprintf(stream, "  dmsl: %" PRIu64 "\n", idfy->dmsl);
 
 	return wrtn;
 }
@@ -1038,7 +1043,7 @@ xnvme_spec_idfy_ctrlr_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ctrlr *idfy, 
 int
 xnvme_spec_nvm_idfy_ctrlr_pr(struct xnvme_spec_nvm_idfy_ctrlr *idfy, int opts)
 {
-	return xnvme_spec_idfy_ctrlr_fpr(stdout, idfy, opts);
+	return xnvme_spec_nvm_idfy_ctrlr_fpr(stdout, idfy, opts);
 }
 
 int

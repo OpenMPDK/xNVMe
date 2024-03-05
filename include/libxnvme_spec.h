@@ -2303,37 +2303,23 @@ struct xnvme_spec_nvm_cmd {
 };
 XNVME_STATIC_ASSERT(sizeof(struct xnvme_spec_nvm_cmd) == 64, "Incorrect size")
 
+/**
+ * Representation of NVMe completion result for NVM command set I/O command set
+ * specific Identify Controller
+ *
+ * That is, for opcode XNVME_SPEC_OPC_IDFY(0x06) with XNVME_SPEC_IDFY_CTLR_IOCS(0x6)
+ *
+ * @struct xnvme_spec_nvm_idfy_ctrlr
+ */
 struct xnvme_spec_nvm_idfy_ctrlr {
-	uint8_t byte0_519[520];
+	uint8_t vsl;    ///< Verify Size Limit
+	uint8_t wzsl;   ///< Write Zeroes Size Limit
+	uint8_t wusl;   ///< Write Uncorrectable Size Limit
+	uint8_t dmrl;   ///< Dataset Management Ranges Limit
+	uint32_t dmrsl; ///< Dataset Management Range Size Limit
+	uint64_t dmsl;  ///< Dataset Management Size Limit
 
-	/** optional nvm command support */
-	union {
-		struct {
-			uint16_t compare           : 1;
-			uint16_t write_unc         : 1;
-			uint16_t dsm               : 1;
-			uint16_t write_zeroes      : 1;
-			uint16_t set_features_save : 1;
-			uint16_t reservations      : 1;
-			uint16_t timestamp         : 1;
-			uint16_t verify            : 1;
-			uint16_t copy              : 1;
-			uint16_t reserved          : 7;
-		};
-		uint16_t val;
-	} oncs;
-
-	uint8_t byte522_533[12];
-
-	union {
-		struct {
-			uint16_t copy_fmt0 : 1;
-			uint16_t rsvd      : 15;
-		};
-		uint16_t val;
-	} ocfs; ///< Optional Copy Format Supported
-
-	uint8_t byte536_4095[3559];
+	uint8_t reserved16[4080];
 };
 XNVME_STATIC_ASSERT(sizeof(struct xnvme_spec_nvm_idfy_ctrlr) == 4096, "Incorrect size")
 
@@ -3086,7 +3072,7 @@ xnvme_spec_idfy_ns_pr(const struct xnvme_spec_idfy_ns *idfy, int opts);
  * @return On success, the number of characters printed is returned.
  */
 int
-xnvme_spec_idfy_ctrl_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy, int opts);
+xnvme_spec_idfy_ctrlr_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy, int opts);
 
 /**
  * Prints the given :;xnvme_spec_idfy_ctrlr to stdout
@@ -3096,7 +3082,7 @@ xnvme_spec_idfy_ctrl_fpr(FILE *stream, const struct xnvme_spec_idfy_ctrlr *idfy,
  * @return On success, the number of characters printed is returned.
  */
 int
-xnvme_spec_idfy_ctrl_pr(const struct xnvme_spec_idfy_ctrlr *idfy, int opts);
+xnvme_spec_idfy_ctrlr_pr(const struct xnvme_spec_idfy_ctrlr *idfy, int opts);
 
 int
 xnvme_spec_idfy_cs_fpr(FILE *stream, const struct xnvme_spec_idfy_cs *idfy, int opts);
@@ -3246,8 +3232,6 @@ xnvme_spec_nvm_scopy_source_range_pr(const struct xnvme_spec_nvm_scopy_source_ra
 /**
  * Prints the given ::xnvme_spec_nvm_idfy_ctrlr to the given output stream
  *
- * Only fields specific to Logical Block Namespaces are printed by this function
- *
  * @param stream output stream used for printing
  * @param idfy pointer to the structure to print
  * @param opts printer options, see ::xnvme_pr
@@ -3255,7 +3239,7 @@ xnvme_spec_nvm_scopy_source_range_pr(const struct xnvme_spec_nvm_scopy_source_ra
  * @return On success, the number of characters printed is returned
  */
 int
-xnvme_spec_idfy_ctrlr_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ctrlr *idfy, int opts);
+xnvme_spec_nvm_idfy_ctrlr_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ctrlr *idfy, int opts);
 
 /**
  * Prints the given ::xnvme_spec_nvm_idfy_ctrlr to stdout
