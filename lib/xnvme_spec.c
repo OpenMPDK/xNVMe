@@ -1068,10 +1068,17 @@ xnvme_spec_nvm_idfy_ns_fpr(FILE *stream, struct xnvme_spec_nvm_idfy_ns *idfy, in
 	}
 
 	wrtn += fprintf(stream, "\n");
-	wrtn += fprintf(stream, "  mcl: %" PRIu32 "\n", idfy->mcl);
-	wrtn += fprintf(stream, "  mssrl: %" PRIu16 "\n", idfy->mssrl);
-	wrtn += fprintf(stream, "  msrc: %" PRIu8 "\n", idfy->msrc);
+	wrtn += fprintf(stream, "  lbstm: %" PRIu64 "\n", idfy->lbstm);
+	wrtn += fprintf(stream, "  oncs:\n");
+	wrtn += fprintf(stream, "    gpistm: %" PRIu8 "\n", idfy->pic.gpistm);
+	wrtn += fprintf(stream, "    gpists: %" PRIu8 "\n", idfy->pic.gpists);
+	wrtn += fprintf(stream, "    stcrs: %" PRIu8 "\n", idfy->pic.stcrs);
 
+	wrtn += fprintf(stream, "  elbaf:\n");
+	for (int i = 0; i < 64; ++i) {
+		wrtn += fprintf(stream, "    - {sts: %" PRIu32 ", pif: %" PRIu32 "}\n",
+				idfy->elbaf[i].sts, idfy->elbaf[i].pif);
+	}
 	return wrtn;
 }
 

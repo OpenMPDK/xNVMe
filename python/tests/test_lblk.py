@@ -204,12 +204,12 @@ class TestLBLK:
             rng_elba,
         ) = boilerplate
 
-        # Force void* casting to xnvme_spec_nvm_idfy_ns*
-        # xnvme_spec_nvm_idfy_ns *nvm = (void *)xnvme_dev_get_ns(dev)
+        # Force void* casting to xnvme_spec_idfy_ns*
+        # xnvme_spec_idfy_ns *nvm = (void *)xnvme_dev_get_ns(dev)
         _nvm = xnvme.xnvme_dev_get_ns(dev)
         _void_p = xnvme.xnvme_void_p(_nvm.void_pointer)
-        nvm = xnvme.xnvme_spec_nvm_idfy_ns(__void_p=_void_p)
-        xnvme.xnvme_spec_nvm_idfy_ns_pr(nvm, xnvme.XNVME_PR_DEF)
+        nvm = xnvme.xnvme_spec_idfy_ns(__void_p=_void_p)
+        xnvme.xnvme_spec_idfy_ns_pr(nvm, xnvme.XNVME_PR_DEF)
 
         if nvm.msrc:
             xfer_naddr = min(min(nvm.msrc + 1, xfer_naddr), nvm.mcl)
@@ -230,8 +230,8 @@ class TestLBLK:
             ),
             xnvme.XNVME_PR_DEF,
         )
-        xnvme.xnvme_spec_nvm_idfy_ns_pr(
-            xnvme.xnvme_spec_nvm_idfy_ns(
+        xnvme.xnvme_spec_idfy_ns_pr(
+            xnvme.xnvme_spec_idfy_ns(
                 __void_p=xnvme.xnvme_void_p(xnvme.xnvme_dev_get_ns(dev).void_pointer)
             ),
             xnvme.XNVME_PR_DEF,

@@ -49,7 +49,7 @@ _conventional_geometry(struct xnvme_dev *dev)
 	const struct xnvme_spec_idfy_ctrlr *ctrlr = (void *)xnvme_dev_get_ctrlr(dev);
 	const struct xnvme_spec_idfy_ns *nvm = (void *)xnvme_dev_get_ns(dev);
 	const struct xnvme_spec_lbaf *lbaf = &nvm->lbaf[nvm->flbas.format];
-	struct xnvme_spec_nvm_idfy_ns_iocs *nns = (void *)xnvme_dev_get_ns_css(dev);
+	struct xnvme_spec_nvm_idfy_ns *nns = (void *)xnvme_dev_get_ns_css(dev);
 	struct xnvme_spec_elbaf *elbaf = &nns->elbaf[nvm->flbas.format];
 	struct xnvme_geo *geo = &dev->geo;
 
