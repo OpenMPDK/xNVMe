@@ -84,7 +84,7 @@ deps:
       pacman: [python3, python-pip, python-setuptools]
       dnf: [python3-devel, python3-pip]
       src: [python3]
-      zypper: [python3, python3-devel, python3-pip]
+      zypper: [python3, python3-devel, python3-pip, python3-setuptools]
 
   pipx:
     notes: Required to install tools utilized for testing, such as CIJOE

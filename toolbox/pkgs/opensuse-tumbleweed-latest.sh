@@ -37,6 +37,7 @@ zypper --non-interactive install -y --allow-downgrade \
  python3-pip \
  python3-pipx \
  python3-pyelftools \
+ python3-setuptools \
  tar
 
 #
