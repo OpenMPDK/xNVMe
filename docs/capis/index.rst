@@ -44,7 +44,6 @@ form.
 .. toctree::
    :hidden:
 
-   xnvme
    xnvme_ident
    xnvme_opts
    xnvme_file
