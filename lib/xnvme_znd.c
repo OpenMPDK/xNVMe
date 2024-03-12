@@ -192,6 +192,31 @@ xnvme_znd_report_from_dev(struct xnvme_dev *dev, uint64_t slba, size_t limit, ui
 }
 
 int
+xnvme_znd_report_get_descr(const struct xnvme_znd_report *report, uint32_t index,
+			   struct xnvme_spec_znd_descr **descr, void **ext)
+{
+	if (index >= report->nentries) {
+		XNVME_DEBUG("FAILED: index(%" PRu32 ") >= report->nentries(%zu)", index,
+			    report->nentries);
+		return -EINVAL;
+	}
+	if (ext && (!report->extended)) {
+		XNVME_DEBUG("FAILED: gave 'ext' but report does not contain extensions.");
+		return -EINVAL;
+	}
+
+	if (descr) {
+		*descr = (struct xnvme_spec_znd_descr *)&(
+			report->storage[index * report->zrent_nbytes]);
+	}
+	if (ext) {
+		*ext = (void *)&report->storage[index * report->zrent_nbytes + report->zd_nbytes];
+	}
+
+	return 0;
+}
+
+int
 xnvme_znd_report_find_arbitrary(const struct xnvme_znd_report *report,
 				enum xnvme_spec_znd_state state, uint64_t *zlba, int opts)
 {
@@ -202,9 +227,14 @@ xnvme_znd_report_find_arbitrary(const struct xnvme_znd_report *report,
 
 	for (uint32_t ci = 0; ci < report->nentries; ++ci) {
 		const uint64_t idx = (arb++) % ((uint64_t)report->nentries);
-		struct xnvme_spec_znd_descr *zdescr = NULL;
+		struct xnvme_spec_znd_descr *zdescr;
+		int err;
 
-		zdescr = XNVME_ZND_REPORT_DESCR(report, idx);
+		err = xnvme_znd_report_get_descr(report, idx, &zdescr, NULL);
+		if (err) {
+			XNVME_DEBUG("xnvme_znd_report_get_descr(), err: %d", err);
+			return err;
+		}
 
 		if ((zdescr->zs == state) && (zdescr->zt == XNVME_SPEC_ZND_TYPE_SEQWR) &&
 		    (zdescr->zcap)) {
@@ -503,7 +533,14 @@ xnvme_znd_report_fpr(FILE *stream, const struct xnvme_znd_report *report, int fl
 
 	wrtn += fprintf(stream, "\n");
 	for (uint32_t idx = 0; idx < report->nentries; ++idx) {
-		struct xnvme_spec_znd_descr *descr = XNVME_ZND_REPORT_DESCR(report, idx);
+		struct xnvme_spec_znd_descr *descr;
+		int err;
+
+		err = xnvme_znd_report_get_descr(report, idx, &descr, NULL);
+		if (err) {
+			XNVME_DEBUG("xnvme_znd_report_get_descr(), err: %d", err);
+			return err;
+		}
 
 		wrtn += fprintf(stream, "    - {");
 		wrtn += xnvme_spec_znd_descr_fpr_yaml(stream, descr, 0, ", ");
