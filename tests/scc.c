@@ -21,8 +21,8 @@ static int
 sub_support(struct xnvme_cli *cli)
 {
 	struct xnvme_dev *dev = cli->args.dev;
-	struct xnvme_spec_nvm_idfy_ctrlr *ctrlr;
-	struct xnvme_spec_nvm_idfy_ns *ns;
+	struct xnvme_spec_idfy_ctrlr *ctrlr;
+	struct xnvme_spec_idfy_ns *ns;
 	int err = 0;
 
 	ctrlr = (void *)xnvme_dev_get_ctrlr(dev);
@@ -37,14 +37,14 @@ sub_support(struct xnvme_cli *cli)
 		xnvme_cli_perr("xnvme_dev_get_ns()", -err);
 		return err;
 	}
-	xnvme_spec_nvm_idfy_ctrlr_pr(ctrlr, XNVME_PR_DEF);
-	xnvme_spec_nvm_idfy_ns_pr(ns, XNVME_PR_DEF);
+	xnvme_spec_idfy_ctrlr_pr(ctrlr, XNVME_PR_DEF);
+	xnvme_spec_idfy_ns_pr(ns, XNVME_PR_DEF);
 
 	if (!ctrlr->oncs.copy) {
 		err = -ENOSYS;
 		xnvme_cli_perr("!ctrlr->oncs.copy", -err);
 	}
-	if (!ctrlr->ocfs.copy_fmt0) {
+	if (!ctrlr->cdfs.format0) {
 		err = -ENOSYS;
 		xnvme_cli_perr("!ctrlr->ocfs.copy_fmt0", -err);
 	}
@@ -67,8 +67,8 @@ static int
 sub_idfy(struct xnvme_cli *cli)
 {
 	struct xnvme_dev *dev = cli->args.dev;
-	struct xnvme_spec_nvm_idfy_ctrlr *ctrlr;
-	struct xnvme_spec_nvm_idfy_ns *ns;
+	struct xnvme_spec_idfy_ctrlr *ctrlr;
+	struct xnvme_spec_idfy_ns *ns;
 	int err;
 
 	ctrlr = (void *)xnvme_dev_get_ctrlr(dev);
@@ -84,8 +84,8 @@ sub_idfy(struct xnvme_cli *cli)
 		return err;
 	}
 
-	xnvme_spec_nvm_idfy_ctrlr_pr(ctrlr, XNVME_PR_DEF);
-	xnvme_spec_nvm_idfy_ns_pr(ns, XNVME_PR_DEF);
+	xnvme_spec_idfy_ctrlr_pr(ctrlr, XNVME_PR_DEF);
+	xnvme_spec_idfy_ns_pr(ns, XNVME_PR_DEF);
 
 	xnvme_cli_pinf("LGTM");
 
@@ -116,7 +116,7 @@ _scopy_helper(struct xnvme_cli *cli, uint64_t tlbas)
 	struct xnvme_dev *dev = cli->args.dev;
 	const struct xnvme_geo *geo = xnvme_dev_get_geo(dev);
 	uint32_t nsid = cli->args.nsid;
-	struct xnvme_spec_nvm_idfy_ns *ns;
+	struct xnvme_spec_idfy_ns *ns;
 	enum xnvme_nvm_scopy_fmt copy_fmt;
 	char *dbuf = NULL, *vbuf = NULL;
 	size_t buf_nbytes;
@@ -321,7 +321,7 @@ sub_scopy(struct xnvme_cli *cli)
 static int
 sub_scopy_msrc(struct xnvme_cli *cli)
 {
-	struct xnvme_spec_nvm_idfy_ns *ns;
+	struct xnvme_spec_idfy_ns *ns;
 
 	ns = (void *)xnvme_dev_get_ns(cli->args.dev);
 	if (!ns) {
