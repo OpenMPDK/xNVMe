@@ -57,14 +57,8 @@ main(int argc, char **argv)
 			err = err ? err : -EIO;
 			goto exit;
 		}
+		xnvme_cli_pinf("Submitted and completed command succesfully");
 	}
-
-	xnvme_cli_pinf("Dumping the first 64 bytes of payload-buffer");
-	printf("buf[0-63]: '");
-	for (size_t i = 0; i < 64; ++i) {
-		printf("%c", buf[i]);
-	}
-	xnvme_cli_pinf("'");
 
 exit:
 	xnvme_buf_free(dev, buf);
