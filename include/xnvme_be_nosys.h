@@ -5,6 +5,10 @@
 #ifndef __INTERNAL_XNVME_BE_NOSYS_H
 #define __INTERNAL_XNVME_BE_NOSYS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern struct xnvme_be xnvme_be_nosys;
 
 int
@@ -123,3 +127,7 @@ xnvme_be_nosys_dev_close(struct xnvme_dev *dev);
 	}
 
 #endif /* __INTERNAL_XNVME_BE_NOSYS_H */
+
+#ifdef __cplusplus
+}
+#endif

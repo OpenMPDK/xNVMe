@@ -13,8 +13,15 @@
 #include <xnvme_dev.h>
 
 static struct xnvme_be *g_xnvme_be_registry[] = {
-	&xnvme_be_spdk,    &xnvme_be_linux,   &xnvme_be_fbsd, &xnvme_be_macos,
-	&xnvme_be_windows, &xnvme_be_ramdisk, &xnvme_be_vfio, NULL,
+	&xnvme_be_spdk,
+	&xnvme_be_linux,
+	&xnvme_be_fbsd,
+	&xnvme_be_macos,
+	&xnvme_be_macos_driverkit,
+	&xnvme_be_windows,
+	&xnvme_be_ramdisk,
+	&xnvme_be_vfio,
+	NULL,
 };
 static int g_xnvme_be_count = sizeof g_xnvme_be_registry / sizeof *g_xnvme_be_registry - 1;
 
@@ -383,6 +390,7 @@ xnvme_enumerate(const char *sys_uri, struct xnvme_opts *opts, xnvme_enumerate_cb
 			XNVME_DEBUG("INFO: skipping be: '%s'; !enabled", be.attr.name);
 			continue;
 		}
+		XNVME_DEBUG("INFO: found be: '%s'; enabled", be.attr.name);
 
 		if (opts && (opts->be) && strcmp(opts->be, be.attr.name)) {
 			// skip if opts->be != be.attr.name
