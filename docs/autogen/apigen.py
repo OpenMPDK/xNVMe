@@ -155,14 +155,23 @@ def main(args):
 
     syms = symbols(args)
 
-    pps = {}
-    for nsprefix, val in syms.items():
-        pps[nsprefix] = find_pp(val)
+    core_namespaces = set(
+        ["xnvme_adm", "xnvme_buf", "xnvme_cmd", "xnvme_dev", "xnvme_nvm", "xnvme_queue"]
+    )
 
-    for nsprefix, val in syms.items():
-        logging.info("nsprefix: %r", nsprefix)
-        rst_fpath = os.path.join(args.output, "%s.rst" % nsprefix)
-        rst = emit(nsprefix, val)
+    pps = {}
+    for namespace, val in syms.items():
+        pps[namespace] = find_pp(val)
+
+    for namespace, val in syms.items():
+        logging.info("namespace: %r", namespace)
+
+        prefix = "extended"
+        if namespace in core_namespaces:
+            prefix = "core"
+
+        rst_fpath = os.path.join(args.output, prefix, "%s.rst" % namespace)
+        rst = emit(namespace, val)
 
         with open(rst_fpath, "w") as rfd:
             rfd.write(rst)

@@ -1,8 +1,8 @@
 .. _sec-c-api-{{ ns }}:
 
-{% for _ in range(ns|length + 2) %}={% endfor %}
- {{ ns }}
-{% for _ in range(ns|length + 2) %}={% endfor %}
+===={% for _ in range(ns|length) %}={% endfor %}===
+ lib{{ ns }}.h
+===={% for _ in range(ns|length) %}={% endfor %}===
 
 
 {% if show_enums %}
@@ -65,7 +65,7 @@ Functions
 Header
 ======
 
-.. literalinclude:: ../../include/lib{{ ns }}.h
+.. literalinclude:: ../../../include/lib{{ ns }}.h
    :language: c
 
 {% endif %}
