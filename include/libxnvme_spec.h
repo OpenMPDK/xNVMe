@@ -2174,6 +2174,7 @@ struct xnvme_spec_nvm_write_zeroes {
 	/* cdw 12 */
 	uint32_t nlb    : 16; ///< Number of logical blocks, zero-based
 	uint32_t rsvd1  : 8;
+	uint32_t stc    : 1; ///< Storage Tag Check
 	uint32_t deac   : 1; ///< Dealocate
 	uint32_t prinfo : 4; ///< Protection Info.
 	uint32_t fua    : 1; ///< Force Unit Access
