@@ -20,7 +20,7 @@ deps:
 # The PYTHONPATH is needed such that we can call the 'xnvme_ver.py' script
 
 .PHONY: clean
-clean:
+clean: clean-apis
 	rm -fr $(BUILD_DIR) || true
 
 .PHONY: configure
@@ -32,6 +32,12 @@ configure: clean
 apis:
 	cd $(SOURCE_DIR) && make tags-xnvme-public
 	${PYTHON} apigen.py --tags $(SOURCE_DIR)/tags --output $(DOCS_DIR)/capis
+
+.PHONY: clean-apis
+clean-apis:
+	rm -f $(DOCS_DIR)/capis/core/xnvme*
+	rm -f $(DOCS_DIR)/capis/extended/xnvme*
+
 
 .PHONY: commands
 commands:

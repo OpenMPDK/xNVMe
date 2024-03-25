@@ -1,21 +1,11 @@
 .. _sec-c-api-{{ ns }}:
 
-{% for _ in range(ns|length + 2) %}={% endfor %}
- {{ ns }}
-{% for _ in range(ns|length + 2) %}={% endfor %}
+===={% for _ in range(ns|length) %}={% endfor %}===
+ lib{{ ns }}.h
+===={% for _ in range(ns|length) %}={% endfor %}===
 
-{% if show_header %}
 
-.. _sec-c-api-{{ ns }}-header:
-
-Header
-======
-
-.. literalinclude:: ../../include/lib{{ ns }}.h
-   :language: c
-
-{% endif %}
-
+{% if show_enums %}
 .. _sec-c-api-{{ ns }}-enum:
 
 Enums
@@ -30,9 +20,11 @@ Enums
 .. doxygenenum:: {{ symb }}
 
 {% endfor %}
+{% endif %}
 
 .. _sec-c-api-{{ ns }}-struct:
 
+{% if show_structs %}
 Structs
 =======
 
@@ -47,7 +39,9 @@ Structs
    :undoc-members:
 
 {% endfor %}
+{% endif %}
 
+{% if show_funcs %}
 .. _sec-c-api-{{ ns }}-func:
 
 Functions
@@ -62,3 +56,16 @@ Functions
 .. doxygenfunction:: {{ symb }}
 
 {% endfor %}
+{% endif %}
+
+{% if show_header %}
+
+.. _sec-c-api-{{ ns }}-header:
+
+Header
+======
+
+.. literalinclude:: ../../../include/lib{{ ns }}.h
+   :language: c
+
+{% endif %}

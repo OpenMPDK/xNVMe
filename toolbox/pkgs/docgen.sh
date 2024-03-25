@@ -13,13 +13,9 @@ apt-get -qy \
 apt-get -qy autoclean
 apt-get -qy install \
         bash \
-        breathe-doc \
         doxygen \
-        exuberant-ctags \
+        universal-ctags \
         git \
         graphviz \
         pkg-config \
         python3 \
-        python3-breathe \
-        python3-pip \
-        python3-sphinx

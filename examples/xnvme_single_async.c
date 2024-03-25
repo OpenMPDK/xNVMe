@@ -5,22 +5,14 @@
 #include <errno.h>
 #include <libxnvme.h>
 
-struct cb_args {
-	uint32_t ecount;
-	uint32_t completed;
-	uint32_t submitted;
-};
-
 static void
-cb_pool(struct xnvme_cmd_ctx *ctx, void *cb_arg)
+cb_fn(struct xnvme_cmd_ctx *ctx, void *XNVME_UNUSED(cb_arg))
 {
-	struct cb_args *cb_args = cb_arg;
-
-	cb_args->completed += 1;
-
 	if (xnvme_cmd_ctx_cpl_status(ctx)) {
+		xnvme_cli_pinf("Command did not complete successfully");
 		xnvme_cmd_ctx_pr(ctx, XNVME_PR_DEF);
-		cb_args->ecount += 1;
+	} else {
+		xnvme_cli_pinf("Command completed succesfully");
 	}
 
 	// Completed: Put the command-context back in the queue
@@ -36,20 +28,18 @@ cb_pool(struct xnvme_cmd_ctx *ctx, void *cb_arg)
  *   | Using command-contexts
  * - Submit the asynchronous command
  *   | Re-submission when busy, reap completion, waiting till empty
- * - Reporting on IO-errors
  * - Teardown
  */
 int
 main(int argc, char **argv)
 {
-	struct cb_args cb_args = {0};
 	struct xnvme_opts opts = xnvme_opts_default();
 	struct xnvme_dev *dev = NULL;
 	uint32_t nsid;
 	char *buf = NULL;
 	size_t buf_nbytes;
 	struct xnvme_queue *queue = NULL;
-	const int qd = 16;
+	const int qdepth = 16;
 	int ret = 0, err = 0;
 
 	if (argc < 2) {
@@ -65,15 +55,17 @@ main(int argc, char **argv)
 	nsid = xnvme_dev_get_nsid(dev);
 
 	// Initialize a command-queue
-	ret = xnvme_queue_init(dev, qd, 0, &queue);
+	ret = xnvme_queue_init(dev, qdepth, 0, &queue);
 	if (ret) {
 		xnvme_cli_perr("xnvme_queue_init()", ret);
 		xnvme_dev_close(dev);
 		return 1;
 	}
 
-	// Set the default callback function and callback function-argument
-	xnvme_queue_set_cb(queue, cb_pool, &cb_args);
+	// Set the callback function
+	// Note: for this example the cb_arg is NULL
+	// However, it would typically be a pointer to a struct
+	xnvme_queue_set_cb(queue, cb_fn, NULL);
 
 	buf_nbytes = xnvme_dev_get_geo(dev)->nbytes;
 
@@ -93,10 +85,9 @@ submit:
 		// Submit a read command
 		err = xnvme_nvm_read(ctx, nsid, 0x0, 0, buf, NULL);
 		switch (err) {
-		// Submission success!
 		case 0:
-			cb_args.submitted += 1;
-			goto next;
+			xnvme_cli_pinf("Submission succeeded");
+			break;
 
 		// Submission failed: queue is full => process completions and try again
 		case -EBUSY:
@@ -107,13 +98,10 @@ submit:
 		// Submission failed: unexpected error, put the command-context back in the queue
 		default:
 			xnvme_cli_perr("xnvme_nvm_read()", err);
-
 			xnvme_queue_put_cmd_ctx(queue, ctx);
 			goto exit;
 		}
 	}
-
-next:
 
 	// Done submitting, wait for all outstanding I/O to complete as we are about to exit
 	ret = xnvme_queue_drain(queue);
@@ -122,24 +110,7 @@ next:
 		goto exit;
 	}
 
-	// Report if the callback function observed completion-errors
-	if (cb_args.ecount) {
-		ret = ret ? ret : EIO;
-		xnvme_cli_perr("got completion errors", EIO);
-		goto exit;
-	}
-
-	xnvme_cli_pinf("Dumping the first 64 bytes of payload-buffer");
-	printf("buf[0-63]: '");
-	for (size_t i = 0; i < 64; ++i) {
-		printf("%c", buf[i]);
-	}
-	xnvme_cli_pinf("'");
-
 exit:
-	xnvme_cli_pinf("cb_args: {submitted: %u, completed: %u, ecount: %u}", cb_args.submitted,
-		       cb_args.completed, cb_args.ecount);
-
 	xnvme_buf_free(dev, buf);
 	xnvme_queue_term(queue);
 	xnvme_dev_close(dev);
