@@ -718,6 +718,84 @@ exit:
 	return err;
 }
 
+static int
+sub_compare(struct xnvme_cli *cli)
+{
+	struct xnvme_dev *dev = cli->args.dev;
+	const struct xnvme_geo *geo = xnvme_dev_get_geo(dev);
+	struct xnvme_cmd_ctx ctx = xnvme_cmd_ctx_from_dev(dev);
+	const uint64_t slba = cli->args.slba;
+	const size_t nlb = cli->args.nlb;
+	uint32_t nsid = cli->args.nsid;
+
+	void *dbuf = NULL, *mbuf = NULL;
+	size_t dbuf_nbytes, mbuf_nbytes;
+	int err;
+
+	switch (geo->type) {
+	case XNVME_GEO_ZONED:
+	case XNVME_GEO_CONVENTIONAL:
+		break;
+	default:
+		XNVME_DEBUG("FAILED: not nvm / zns, got; %d", geo->type);
+		return -EINVAL;
+	}
+
+	if (!cli->given[XNVME_CLI_OPT_NSID]) {
+		nsid = xnvme_dev_get_nsid(dev);
+	}
+
+	dbuf_nbytes = (nlb + 1) * geo->lba_nbytes;
+	mbuf_nbytes = geo->lba_extended ? 0 : (nlb + 1) * geo->nbytes_oob;
+
+	xnvme_cli_pinf("Comparing nsid: 0x%x, slba: 0x%016lx, nlb: %zu", nsid, slba, nlb);
+
+	xnvme_cli_pinf("Alloc/fill dbuf, dbuf_nbytes: %zu", dbuf_nbytes);
+	dbuf = xnvme_buf_alloc(dev, dbuf_nbytes);
+	if (!dbuf) {
+		err = -errno;
+		xnvme_cli_perr("xnvme_buf_alloc()", err);
+		goto exit;
+	}
+	err = xnvme_buf_fill(dbuf, dbuf_nbytes,
+			     cli->args.data_input ? cli->args.data_input : "anum");
+	if (err) {
+		xnvme_cli_perr("xnvme_buf_fill()", err);
+		goto exit;
+	}
+
+	if (mbuf_nbytes) {
+		xnvme_cli_pinf("Alloc/fill mbuf, mbuf_nbytes: %zu", mbuf_nbytes);
+		mbuf = xnvme_buf_alloc(dev, mbuf_nbytes);
+		if (!mbuf) {
+			err = -errno;
+			xnvme_cli_perr("xnvme_buf_alloc()", err);
+			goto exit;
+		}
+		err = xnvme_buf_fill(mbuf, mbuf_nbytes,
+				     cli->args.meta_input ? cli->args.meta_input : "anum");
+		if (err) {
+			xnvme_cli_perr("xnvme_buf_fill()", err);
+			goto exit;
+		}
+	}
+
+	xnvme_cli_pinf("Sending the command...");
+	err = xnvme_nvm_compare(&ctx, nsid, slba, nlb, dbuf, mbuf);
+	if (err || xnvme_cmd_ctx_cpl_status(&ctx)) {
+		xnvme_cli_perr("xnvme_nvm_compare()", err);
+		xnvme_cmd_ctx_pr(&ctx, XNVME_PR_DEF);
+		err = err ? err : -EIO;
+		goto exit;
+	}
+
+exit:
+	xnvme_buf_free(dev, dbuf);
+	xnvme_buf_free(dev, mbuf);
+
+	return err;
+}
+
 //
 // Command-Line Interface (CLI) definition
 //
@@ -914,6 +992,25 @@ static struct xnvme_cli_sub g_subs[] = {
 			{XNVME_CLI_OPT_PRCHK, XNVME_CLI_LOPT},
 			{XNVME_CLI_OPT_APPTAG, XNVME_CLI_LOPT},
 			{XNVME_CLI_OPT_APPTAG_MASK, XNVME_CLI_LOPT},
+			{XNVME_CLI_OPT_DATA_INPUT, XNVME_CLI_LOPT},
+			{XNVME_CLI_OPT_META_INPUT, XNVME_CLI_LOPT},
+
+			XNVME_CLI_SYNC_OPTS,
+		},
+	},
+	{
+		"compare",
+		"Compare data and optionally metadata",
+		"Compare data and optionally metadata",
+		sub_compare,
+		{
+			{XNVME_CLI_OPT_POSA_TITLE, XNVME_CLI_SKIP},
+			{XNVME_CLI_OPT_URI, XNVME_CLI_POSA},
+
+			{XNVME_CLI_OPT_NON_POSA_TITLE, XNVME_CLI_SKIP},
+			{XNVME_CLI_OPT_SLBA, XNVME_CLI_LREQ},
+			{XNVME_CLI_OPT_NLB, XNVME_CLI_LREQ},
+			{XNVME_CLI_OPT_NSID, XNVME_CLI_LOPT},
 			{XNVME_CLI_OPT_DATA_INPUT, XNVME_CLI_LOPT},
 			{XNVME_CLI_OPT_META_INPUT, XNVME_CLI_LOPT},
 

@@ -37,6 +37,15 @@ def test_write(cijoe, device, be_opts, cli_args):
     assert not err
 
 
+@xnvme_parametrize(labels=["dev"], opts=["be", "admin"])
+def test_compare(cijoe, device, be_opts, cli_args):
+    src = "/tmp/file.bin"
+
+    err, _ = cijoe.run(f"lblk read {cli_args} --slba 0x0 --nlb 0 --data-output {src}")
+    err, _ = cijoe.run(f"lblk compare {cli_args} --slba 0x0 --nlb 0 --data-input {src}")
+    assert not err
+
+
 @xnvme_parametrize(labels=["write_uncor"], opts=["be", "admin"])
 def test_write_uncor(cijoe, device, be_opts, cli_args):
     err, _ = cijoe.run(f"lblk write-uncor {cli_args} --slba 0x0 --nlb 0")
