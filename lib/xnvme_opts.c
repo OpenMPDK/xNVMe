@@ -72,9 +72,6 @@ xnvme_opts_yaml(FILE *stream, const struct xnvme_opts *opts, int indent, const c
 	wrtn += fprintf(stream, "%*sregister_buffers: %" PRIu8 "%s", indent, "",
 			opts->register_buffers, sep);
 
-	wrtn += fprintf(stream, "%*scss.given: %" PRIu32 "%s", indent, "", opts->css.given, sep);
-	wrtn += fprintf(stream, "%*scss.value: 0x%" PRIx32 "%s", indent, "", opts->css.value, sep);
-
 	wrtn += fprintf(stream, "%*suse_cmb_sqs: 0x%" PRIx32 "%s", indent, "", opts->use_cmb_sqs,
 			sep);
 	wrtn += fprintf(stream, "%*sshm_id: 0x%" PRIx32 "%s", indent, "", opts->shm_id, sep);

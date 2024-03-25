@@ -367,8 +367,8 @@ _spdk_setup_controller_opts(struct xnvme_opts *opts, const struct spdk_nvme_tran
 #ifdef XNVME_DEBUG_ENABLED
 	_spdk_nvme_transport_id_pr(trid);
 #endif
-
-	ctrlr_opts->command_set = opts->css.given ? opts->css.value : SPDK_NVME_CC_CSS_IOCS;
+	// Always support one or more IO command sets
+	ctrlr_opts->command_set = SPDK_NVME_CC_CSS_IOCS;
 
 	switch (trid->trtype) {
 	case SPDK_NVME_TRANSPORT_PCIE:

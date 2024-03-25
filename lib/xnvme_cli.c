@@ -632,12 +632,6 @@ static struct xnvme_cli_opt_attr xnvme_cli_opts[] = {
 		.descr = "For be=spdk, use controller-memory-buffer for sqs",
 	},
 	{
-		.opt = XNVME_CLI_OPT_CSS,
-		.vtype = XNVME_CLI_OPT_VTYPE_HEX,
-		.name = "css",
-		.descr = "For be=spdk, ctrl.config. command-set-selection",
-	},
-	{
 		.opt = XNVME_CLI_OPT_ADRFAM,
 		.vtype = XNVME_CLI_OPT_VTYPE_STR,
 		.name = "adrfam",
@@ -1390,11 +1384,6 @@ xnvme_cli_assign_arg(struct xnvme_cli *cli, struct xnvme_cli_opt_attr *opt_attr,
 	case XNVME_CLI_OPT_USE_CMB_SQS:
 		args->use_cmb_sqs = arg ? num : 0;
 		break;
-	case XNVME_CLI_OPT_CSS:
-		args->css.value = arg ? num : 0;
-		args->css.given = arg ? 1 : 0;
-		break;
-
 	case XNVME_CLI_OPT_POLL_IO:
 		args->poll_io = arg ? num : 0;
 		break;
@@ -1921,9 +1910,6 @@ xnvme_cli_to_opts(const struct xnvme_cli *cli, struct xnvme_opts *opts)
 	opts->register_buffers = cli->given[XNVME_CLI_OPT_REGISTER_BUFFERS]
 					 ? cli->args.register_buffers
 					 : opts->register_buffers;
-
-	opts->css.value = cli->given[XNVME_CLI_OPT_CSS] ? cli->args.css.value : opts->css.value;
-	opts->css.given = cli->given[XNVME_CLI_OPT_CSS] ? cli->args.css.given : opts->css.given;
 
 	opts->use_cmb_sqs =
 		cli->given[XNVME_CLI_OPT_USE_CMB_SQS] ? cli->args.use_cmb_sqs : opts->use_cmb_sqs;

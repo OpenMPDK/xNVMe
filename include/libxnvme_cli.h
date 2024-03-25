@@ -120,8 +120,6 @@ struct xnvme_cli_args {
 	uint32_t main_core;
 	const char *core_mask;
 
-	struct xnvme_opts_css css; ///< SPDK controller-setup: do command-set-selection
-
 	uint32_t use_cmb_sqs;
 	const char *adrfam;
 
@@ -278,7 +276,6 @@ enum xnvme_cli_opt {
 	XNVME_CLI_OPT_CORE_MASK = 81, ///< XNVME_CLI_OPT_CORE_MASK
 
 	XNVME_CLI_OPT_USE_CMB_SQS = 82, ///< XNVME_CLI_OPT_USE_CMB_SQS
-	XNVME_CLI_OPT_CSS         = 83, ///< XNVME_CLI_OPT_CSS
 
 	XNVME_CLI_OPT_POLL_IO          = 84, ///< XNVME_CLI_OPT_POLL_IO
 	XNVME_CLI_OPT_POLL_SQ          = 85, ///< XNVME_CLI_OPT_POLL_SQ
