@@ -173,3 +173,18 @@ xnvme_nvm_mgmt_send(struct xnvme_cmd_ctx *ctx, uint32_t nsid, uint8_t mo, uint16
 
 	return xnvme_cmd_pass(ctx, dbuf, dbuf_nbytes, NULL, 0x0);
 }
+
+int
+xnvme_nvm_compare(struct xnvme_cmd_ctx *ctx, uint32_t nsid, uint64_t slba, uint16_t nlb,
+		  void *dbuf, void *mbuf)
+{
+	size_t dbuf_nbytes = dbuf ? ctx->dev->geo.lba_nbytes * (nlb + 1) : 0;
+	size_t mbuf_nbytes = mbuf ? ctx->dev->geo.nbytes_oob * (nlb + 1) : 0;
+
+	ctx->cmd.common.opcode = XNVME_SPEC_NVM_OPC_COMPARE;
+	ctx->cmd.common.nsid = nsid;
+	ctx->cmd.compare.slba = slba;
+	ctx->cmd.compare.nlb = nlb;
+
+	return xnvme_cmd_pass(ctx, dbuf, dbuf_nbytes, mbuf, mbuf_nbytes);
+}
