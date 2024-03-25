@@ -2590,6 +2590,33 @@ struct xnvme_spec_kvs_cmd {
 };
 XNVME_STATIC_ASSERT(sizeof(struct xnvme_spec_kvs_cmd) == 64, "Incorrect size")
 
+struct xnvme_spec_nvm_compare {
+	uint32_t cdw00_09[10]; ///< Command dword 0 to 9
+
+	/* cdw 10-11 */
+	uint64_t slba; ///< Start LBA
+
+	/* cdw 12 */
+	uint32_t nlb    : 16; ///< Number of logical blocks, zero-based
+	uint32_t rsvd1  : 8;
+	uint32_t stc    : 1; ///< Storage Tag Check
+	uint32_t rsvd2  : 1;
+	uint32_t prinfo : 4; ///< Protection Information
+	uint32_t fua    : 1; ///< Force Unit Access
+	uint32_t lr     : 1; ///< Limited Retry
+
+	/* cdw 13 */
+	uint32_t cdw_13; ///< Command dword 13
+
+	/* cdw 14 */
+	uint32_t ilbrt : 32; ///< Initial Logical Block Reference Tag
+
+	/* cdw 15 */
+	uint32_t lbat  : 16; ///< Logical Block Application Tag
+	uint32_t lbatm : 16; ///< logical Block Application Tag Mask
+};
+XNVME_STATIC_ASSERT(sizeof(struct xnvme_spec_nvm_compare) == 64, "Incorrect size")
+
 /**
  * NVMe Command Accessors
  *
@@ -2613,6 +2640,7 @@ struct xnvme_spec_cmd {
 		struct xnvme_spec_znd_cmd znd;
 		struct xnvme_spec_io_mgmt_cmd mgmt;
 		struct xnvme_spec_kvs_cmd kvs;
+		struct xnvme_spec_nvm_compare compare;
 	};
 };
 XNVME_STATIC_ASSERT(sizeof(struct xnvme_spec_cmd) == 64, "Incorrect size")

@@ -162,6 +162,23 @@ xnvme_nvm_mgmt_recv(struct xnvme_cmd_ctx *ctx, uint32_t nsid, uint8_t mo, uint16
 int
 xnvme_nvm_mgmt_send(struct xnvme_cmd_ctx *ctx, uint32_t nsid, uint8_t mo, uint16_t mos, void *dbuf,
 		    uint32_t dbuf_nbytes);
+
+/**
+ * Submit, and optionally wait for completion of, a NVMe Compare
+ *
+ * @param ctx Pointer to command context (::xnvme_cmd_ctx)
+ * @param nsid Namespace Identifier
+ * @param slba The LBA to start the compare at
+ * @param nlb Number of LBAs to be compared. NOTE: nlb is a zero-based value
+ * @param dbuf Pointer to buffer; Payload as indicated by 'ctx->opts'
+ * @param mbuf Pointer to buffer; Payload as indicated by 'ctx->opts'
+ *
+ * @return On success, 0 is returned. On error, negative `errno` is returned.
+ */
+int
+xnvme_nvm_compare(struct xnvme_cmd_ctx *ctx, uint32_t nsid, uint64_t slba, uint16_t nlb,
+		  void *dbuf, void *mbuf);
+
 #ifdef __cplusplus
 }
 #endif

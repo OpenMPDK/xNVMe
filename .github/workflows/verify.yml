@@ -516,7 +516,7 @@ jobs:
       run: |
         cd cijoe && cijoe \
         --config "configs/ramdisk-macos.toml" \
-        --workflow "workflows/test-ramdisk.yaml" \
+        --workflow "workflows/test-ramdisk-macos.yaml" \
         --output "test-${{ matrix.runner.os }}-${{ matrix.runner.ver }}"
 
     - name: CIJOE, upload test-ramdisk-report

@@ -23,6 +23,7 @@ xnvme_be_ramdisk_sync_cmd_io(struct xnvme_cmd_ctx *ctx, void *dbuf, size_t dbuf_
 	size_t sdlba_offset = 0;
 	const uint64_t ssw = ctx->dev->geo.ssw;
 	char *offset = state->ramdisk;
+	int err = 0;
 
 	if (mbuf || mbuf_nbytes) {
 		XNVME_DEBUG("FAILED: mbuf or mbuf_nbytes provided");
@@ -70,12 +71,19 @@ xnvme_be_ramdisk_sync_cmd_io(struct xnvme_cmd_ctx *ctx, void *dbuf, size_t dbuf_
 		// Just pass on the command, as it is just a hint to the controller.
 		break;
 
+	case XNVME_SPEC_NVM_OPC_COMPARE:
+		err = memcmp(offset + (ctx->cmd.nvm.slba << ssw), dbuf, dbuf_nbytes);
+		if (err) {
+			return -EIO;
+		}
+		break;
+
 	default:
 		XNVME_DEBUG("FAILED: nosys opcode: %d", ctx->cmd.common.opcode);
 		return -ENOSYS;
 	}
 
-	return 0;
+	return err;
 }
 
 int
